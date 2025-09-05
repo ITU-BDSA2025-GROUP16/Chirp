@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.CommandLine;
+using System.Globalization;
 using Microsoft.VisualBasic.FileIO;
 using System.Text.RegularExpressions;
 using CsvHelper;
@@ -15,8 +16,6 @@ class Program
     static void Main(string[] args)
     {
 
-        //Parse input for at beslutte hvilken metode køres
-        
         if (args.Length == 0)
         {
             Console.WriteLine("'dotnet run read' to read csv");

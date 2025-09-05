@@ -1,6 +1,15 @@
-﻿using Microsoft.VisualBasic.FileIO;
+﻿using System.Globalization;
+using Microsoft.VisualBasic.FileIO;
 using System.Text.RegularExpressions;
+using CsvHelper;
 
+
+class Cheep
+{
+    public string? Author { get; set; }
+    public string? Message { get; set; }
+    public long Timestamp { get; set; }
+}
 class Program
 {
     static void Main(string[] args)
@@ -36,55 +45,44 @@ class Program
 
     static void ReadCsv() //printer alt i csv som følger format
     {
-        try
-        {
-            using var parser = new TextFieldParser("data/chirp_cli_db.csv");
-            parser.TextFieldType = FieldType.Delimited;
-            parser.SetDelimiters(",");
-            parser.ReadLine();
+        Console.WriteLine("ReacCsv reached");
+        using var reader = new StreamReader("data/chirp_cli_db.csv");
+        using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
-            while (!parser.EndOfData)
-            {
-                var text = parser.ReadFields();
-                
-                if (text.Length != 3)
-                {
-                    continue;
-                }
-                
-                string digitsOnly = Regex.Replace(text[2], @"\D", "");
-                long time = long.Parse(digitsOnly);
-
-                DateTimeOffset dto = DateTimeOffset.FromUnixTimeSeconds(time).ToLocalTime();
-                Console.WriteLine($"{text[0]} @ {dto:dd/MM/yy HH:mm:ss}: {text[1]}");
-            }
-        }
-        catch (IOException e)
+        var records = csv.GetRecords<Cheep>();
+        foreach (var record in records)
         {
-            Console.WriteLine("The file could not be read:");
-            Console.WriteLine(e.Message);
+            var dto = DateTimeOffset.FromUnixTimeSeconds(record.Timestamp).ToLocalTime();
+            Console.WriteLine($"{record.Author} @ {dto:dd/MM/yy HH:mm:ss}: {record.Message}");
         }
     }
     
     static void AppendCheep(string[] message) //Indsætter ny linje i csv
     {
-        string filePath = "data/chirp_cli_db.csv";
-        using StreamWriter writer = File.AppendText(filePath);
-        
-        String username = Environment.UserName;
-        long unixTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        DateTimeOffset dto = DateTimeOffset.FromUnixTimeSeconds(unixTime).ToLocalTime();
+            var filePath = "data/chirp_cli_db.csv";
+        var username = Environment.UserName;
+        var unixTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        var fullMessage = string.Join(" ", message);
 
-        
-        string fullMessage = string.Join(" ", message);
-        string fullMessageFinal = $"{username},\"{fullMessage}\",{unixTime}";
+        var record = new Cheep { Author = username, Message = fullMessage, Timestamp = unixTime };
 
-        
-        writer.WriteLine(fullMessageFinal); 
-        Console.WriteLine(fullMessageFinal + " added to csv");
-        
-        
-    }
+        bool fileExists = File.Exists(filePath);
+
+        using var stream = new FileStream(filePath, FileMode.Append, FileAccess.Write);
+        using var writer = new StreamWriter(stream);
+        using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+
+        if (!fileExists || new FileInfo(filePath).Length == 0)
+        {
+            csv.WriteHeader<Cheep>();
+            csv.NextRecord();
+        }
+
+        csv.WriteRecord(record);
+        csv.NextRecord();
+
+        Console.WriteLine($"{username}, \"{fullMessage}\", {unixTime} added to csv");
+    }   
 }
 
 

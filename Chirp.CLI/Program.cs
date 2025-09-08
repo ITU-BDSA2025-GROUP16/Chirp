@@ -1,51 +1,61 @@
-﻿using System.Globalization;
-using Microsoft.VisualBasic.FileIO;
+﻿using Microsoft.VisualBasic.FileIO;
 using System.Text.RegularExpressions;
+using CommandLine;
 using CsvHelper;
+using System.Globalization;
 
 
-class Cheep
+
+class Cheep //CsvHelper 
 {
     public string? Author { get; set; }
     public string? Message { get; set; }
     public long Timestamp { get; set; }
 }
-class Program
+
+//system.commandline
+[Verb("read", HelpText = "Read all cheeps from csv")]
+class ReadOptions { }
+[Verb("cheep", HelpText = "Add new cheep")]
+class CheepOptions
 {
-    static void Main(string[] args)
+    [Value(0, Min = 1, HelpText = "Message text", Required = true)]
+    public IEnumerable<string> Message { get; set; } = Enumerable.Empty<string>();
+}
+
+
+class Program
+{ 
+    static int Main(string[] args)
     {
+        var result = Parser.Default.ParseArguments<ReadOptions, CheepOptions>(args);
+        int exitCode = 1;
 
-        //Parse input for at beslutte hvilken metode køres
-        
-        if (args.Length == 0)
-        {
-            Console.WriteLine("'dotnet run read' to read csv");
-            Console.WriteLine("'dotnet run cheep \"text\"' to add new line to csv");
+        result.MapResult(
+            (ReadOptions opts) =>
+            {
+                ReadCsv();
+                exitCode = 0;
+                return exitCode;
+            },
+            (CheepOptions opts) =>
+            {
+                AppendCheep(opts.Message.ToArray());
+                exitCode = 0;
+                return exitCode;
+            },
+            errs =>
+            {
+                exitCode = 1;
+                return exitCode;
+            });
 
-            return;
-        }
-
-        if (args[0].ToLower() == "read")
-        {
-            ReadCsv();
-        }
-        else if (args[0].ToLower() == "cheep" && args.Length > 1)
-        {
-            args = args[1..];
-            AppendCheep(args);
-        }
-        else
-        {
-            Console.WriteLine("invalid argument");
-        }
-
-
-        
+        return exitCode;
     }
+
 
     static void ReadCsv() //printer alt i csv som følger format
     {
-        Console.WriteLine("ReacCsv reached");
         using var reader = new StreamReader("data/chirp_cli_db.csv");
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
@@ -57,9 +67,9 @@ class Program
         }
     }
     
-    static void AppendCheep(string[] message) //Indsætter ny linje i csv
+    static void AppendCheep(IEnumerable<string> message) //Indsætter ny linje i csv (skal følge format)
     {
-            var filePath = "data/chirp_cli_db.csv";
+        var filePath = "data/chirp_cli_db.csv";
         var username = Environment.UserName;
         var unixTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         var fullMessage = string.Join(" ", message);

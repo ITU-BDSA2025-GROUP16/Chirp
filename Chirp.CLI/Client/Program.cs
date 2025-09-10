@@ -5,8 +5,7 @@ using CsvHelper;
 using System.Globalization;
 
 
-
-class Cheep //CsvHelper 
+public class Cheep //CsvHelper 
 {
     public string? Author { get; set; }
     public string? Message { get; set; }

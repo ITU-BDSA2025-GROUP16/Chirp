@@ -16,7 +16,7 @@
     class Program
     {
         private static readonly IDatabaseRepository<Cheep> _database =
-            new CSVDatabase<Cheep>("../../data/chirp_cli_db.csv");
+            CSVDatabase<Cheep>.Instance;
 
         static int Main(string[] args)
         {

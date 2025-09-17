@@ -1,10 +1,12 @@
-namespace SimpleDB.Tests;
+namespace Chirp.Tests;
+using SimpleDB;
+using Xunit;
 
-public class UnitTest1
+public class SimpleDBTests
 {
     [Fact]
-    public void Test1()
+    public void test1
     {
-
+        
     }
 }

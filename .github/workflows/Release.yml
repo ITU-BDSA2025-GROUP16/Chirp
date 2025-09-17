@@ -40,7 +40,7 @@ jobs:
           zip -r Chirp-${{ matrix.os }}-${{ matrix.arch }}.zip ${{ matrix.os }}-${{ matrix.arch }}
 
       - name: Upload Release Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Chirp-${{ matrix.os }}-${{ matrix.arch }}
           path: ./artifacts/Chirp-${{ matrix.os }}-${{ matrix.arch }}.zip

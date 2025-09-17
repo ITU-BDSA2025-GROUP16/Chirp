@@ -47,10 +47,10 @@ jobs:
       - name: Package as Zip
         run: |
           cd artifacts
-          zip -r Chirp-$RUNTIME.zip $RUNTIME
+          zip -r ${RUNTIME}.zip $RUNTIME
 
       - name: Upload Release Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Chirp-$RUNTIME
-          path: ./artifacts/Chirp-$RUNTIME.zip
+          name: Chirp-{{ env.RUNTIME }}
+          path: ./artifacts/${{ env.RUNTIME }}.zip

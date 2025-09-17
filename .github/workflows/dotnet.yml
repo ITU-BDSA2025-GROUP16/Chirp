@@ -1,12 +1,13 @@
-name: Deploy CSV Database Web Service to Azure
+name: .NET Build & Test
 
 on:
   push:
-    branches: [ "main" ]  
-  workflow_dispatch:       
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,21 +17,13 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'  
+          dotnet-version: '8.0.x'   # Adjust to your project's target version
 
       - name: Restore dependencies
-        run: dotnet restore ./src/Chirp.CSVDB.Service
+        run: dotnet restore ./src/Chirp.CLI
 
       - name: Build
-        run: dotnet build ./src/Chirp.CSVDB.Service/Chirp.CSVDB.Service.csproj --configuration Release --no-restore
+        run: dotnet build ./src/Chirp.CLI/Chirp.CLI.csproj --no-restore --configuration Release
 
-      - name: Publish
-        run: dotnet publish ./src/Chirp.CSVDB.Service/Chirp.CSVDB.Service.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
-
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: bdsagroup16chirpremotedb   # replace <no> with your group number
-          slot-name: production
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ${{env.DOTNET_ROOT}}/myapp
+      - name: Test
+        run: dotnet test ./src/Chirp.CLI/Chirp.CLI.csproj --no-build --verbosity normal

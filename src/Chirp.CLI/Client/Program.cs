@@ -15,8 +15,20 @@
 
     class Program
     {
-        private static readonly IDatabaseRepository<Cheep> _database =
-            new CSVDatabase<Cheep>("../../data/chirp_cli_db.csv");
+        private static readonly IDatabaseRepository<Cheep> _database = CreateDatabase();
+
+        private static IDatabaseRepository<Cheep> CreateDatabase() {
+        
+        string? executableDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+        
+        string dataDir = Path.Combine(executableDir ?? Environment.CurrentDirectory, "data");
+        
+        Directory.CreateDirectory(dataDir);
+        
+        string dbPath = Path.Combine(dataDir, "chirp_cli_db.csv");
+        
+        return new CSVDatabase<Cheep>(dbPath);
+        }
 
         static int Main(string[] args)
         {

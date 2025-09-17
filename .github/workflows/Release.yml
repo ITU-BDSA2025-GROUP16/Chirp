@@ -26,21 +26,31 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore ./src/Chirp.CLI
 
-      - name: Build
+      - name: Set runtime identifier
+        run: |
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            echo "RUNTIME=win-${{ matrix.arch }}" >> $GITHUB_ENV
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            echo "RUNTIME=osx-${{ matrix.arch }}" >> $GITHUB_ENV
+          else
+            echo "RUNTIME=linux-${{ matrix.arch }}" >> $GITHUB_ENV
+          fi
+
+      - name: Build & Publish
         run: |
           dotnet publish ./src/Chirp.CLI/Chirp.CLI.csproj \
             --configuration Release \
-            --runtime ${{ matrix.os == 'windows-latest' && 'win-${{ matrix.arch }}' || matrix.os == 'macos-latest' && 'osx-${{ matrix.arch }}' || 'linux-${{ matrix.arch }}' }} \
+            --runtime $RUNTIME \
             --self-contained true \
-            -o ./artifacts/${{ matrix.os }}-${{ matrix.arch }}
+            -o ./artifacts/$RUNTIME
 
       - name: Package as Zip
         run: |
           cd artifacts
-          zip -r Chirp-${{ matrix.os }}-${{ matrix.arch }}.zip ${{ matrix.os }}-${{ matrix.arch }}
+          zip -r Chirp-$RUNTIME.zip $RUNTIME
 
       - name: Upload Release Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Chirp-${{ matrix.os }}-${{ matrix.arch }}
-          path: ./artifacts/Chirp-${{ matrix.os }}-${{ matrix.arch }}.zip
+          name: Chirp-$RUNTIME
+          path: ./artifacts/Chirp-$RUNTIME.zip

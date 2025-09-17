@@ -5,13 +5,17 @@ namespace SimpleDB;
 
 public sealed class CSVDatabase<T> : IDatabaseRepository<T> where T : class
 {
+    private static readonly Lazy<CSVDatabase<T>> _lazyInstance =
+        new Lazy<CSVDatabase<T>>(() => new CSVDatabase<T>("../../data/chirp_cli_db.csv"));
+
+    public static CSVDatabase<T> Instance => _lazyInstance.Value;
+
     private readonly string _filePath;
 
-    public CSVDatabase(string filePath)
+    private CSVDatabase(string filePath)
     {
         _filePath = filePath;
 
-        // If file doesn't exist, create an empty one with headers
         if (!File.Exists(_filePath))
         {
             using var writer = new StreamWriter(_filePath);

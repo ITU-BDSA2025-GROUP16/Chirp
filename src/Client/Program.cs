@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 
 
-var client = new HttpClient { BaseAddress = new Uri("http://localhost:5080") };
+var client = new HttpClient { BaseAddress = new Uri("http://localhost:5086") };
 
 while (true)
 {
@@ -22,10 +22,12 @@ while (true)
     switch (input)
     {
         case "Cheep":
+            Console.Write("Enter your message: ");
             await Cheep();
             break;
         case "Cheeps":
-            await AddUser();
+            Console.WriteLine("How many cheeps do you want to read? (or press Enter to read all)");
+            await ReadCheeps();
             break;
         default:
             Console.WriteLine("Invalid Choise... Try again!");
@@ -35,63 +37,95 @@ while (true)
 
 async Task Cheep()
 {
-    try
+    var CheepMessage = Console.ReadLine();
+    if (!string.IsNullOrWhiteSpace(CheepMessage)) {
+    
+        try
+        {
+
+            var cheep = new Cheep
+                {
+                    Author = Environment.UserName,
+                    Message = CheepMessage,
+                    Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+                };
+        
+                var response = await client.PostAsJsonAsync("/cheeps", cheep);
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Failed to add cheep. Status code: " + response.StatusCode);
+                    return;
+                }
+                Console.WriteLine("Cheep added successfully.");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("ERROR: " + e.Message);
+        }
+    }
+}
+
+async Task ReadCheeps()
+{
+    var cheepCountInput = Console.ReadLine();
+    if (!string.IsNullOrWhiteSpace(cheepCountInput) && int.TryParse(cheepCountInput, out int cheepCount))
     {
-        var cheep = new Cheep
+        try
+        {
+            var response = await client.GetAsync($"/cheeps?count={cheepCount}");
+            if (!response.IsSuccessStatusCode)
             {
-                Author = Environment.UserName,
-                Message = await.,
-                Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
-            };
+                Console.WriteLine("Failed to fetch cheeps. Status code: " + response.StatusCode);
+                return;
+            }
 
-            //_database.Store(cheep);
-            //Client.UserInterface.ShowCheepAdded(cheep);
-    }
-    catch (Exception e)
-    {
-        Console.WriteLine("ERROR: " + e.Message);
-    }
-}
-
-async Task AddUser()
-{
-    Console.WriteLine("Enter user ID: ");
-    var inputUserID = Console.ReadLine();
-    Console.WriteLine("Enter user name");
-    var inputUserName = Console.ReadLine();
-
-    if (!int.TryParse(inputUserID, out var id) || string.IsNullOrWhiteSpace(inputUserName))
-    {
-        Console.WriteLine("Invalid entry");
-        return;
-    }
-
-    var newUser = new User { Id = id, Name = inputUserName };
-
-    try
-    {
-        var response = await client.PostAsJsonAsync("/users", newUser);
-        if (response.IsSuccessStatusCode)
-        {
-            Console.WriteLine("User added to database successfully");
+            var cheeps = await response.Content.ReadFromJsonAsync<List<Cheep>>();
+            if (cheeps != null)
+            {
+                foreach (var cheep in cheeps)
+                {
+                    Console.WriteLine($"[{DateTimeOffset.FromUnixTimeSeconds(cheep.Timestamp)}] {cheep.Author}: {cheep.Message}");
+                }
+            }
         }
-        else
+        catch (Exception e)
         {
-            Console.WriteLine("Failed: " + response.StatusCode);
+            Console.WriteLine("ERROR: " + e.Message);
         }
     }
-    catch (Exception e)
+    else
     {
-        Console.WriteLine("ERROR: " + e.Message);
-    }
+        try
+        {
+            var response = await client.GetAsync("/cheeps");
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Failed to fetch cheeps. Status code: " + response.StatusCode);
+                return;
+            }
 
-}
-public class User
+            var cheeps = await response.Content.ReadFromJsonAsync<List<Cheep>>();
+            if (cheeps != null)
+            {
+                foreach (var cheep in cheeps)
+                {
+                    Console.WriteLine($"[{DateTimeOffset.FromUnixTimeSeconds(cheep.Timestamp)}] {cheep.Author}: {cheep.Message}");
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("ERROR: " + e.Message);
+        }
+    } 
+ }
+
+public class Cheep
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
+    public required string Author { get; set; }
+    public required string Message { get; set; }
+    public long Timestamp { get; set; }
 }
-localhost
 
 
 

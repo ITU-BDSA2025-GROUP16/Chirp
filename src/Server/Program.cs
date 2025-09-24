@@ -1,25 +1,35 @@
-var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddRazorPages();
 
-var app = builder.Build();
+var app = WebApplication.Create();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+app.MapGet("/cheeps", () =>
 {
-    app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
+    var lines = File.ReadAllLines("../../data/chirp_cli_db.csv");
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
+    return lines
+        .Skip(1)
+        .Where(line => !string.IsNullOrWhiteSpace(line))
+        .Select(line => line.Split(","))
+        .Select(parts => new Cheep
+        {
+            Author = parts[0].Trim(),
+            Message = parts[1].Trim(),
+            Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds()
+        })
+        .ToList();
+});
 
-app.UseRouting();
-
-app.UseAuthorization();
-
-app.MapRazorPages();
+app.MapPost("/cheeps", (Cheep newCheep) =>
+{
+    File.AppendAllText("../../data/chirp_cli_db.csv", $"{newCheep.Author}, {newCheep.Message}, {newCheep.Timestamp}");
+    return Results.Created($"/users/{newCheep.Timestamp}", newCheep);
+});
 
 app.Run();
+
+public class Cheep
+{
+    public required string Author { get; set; }
+    public required string Message { get; set; }
+    public long Timestamp { get; set; }
+}

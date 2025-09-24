@@ -13,6 +13,10 @@
         public IEnumerable<string> Message { get; set; } = Enumerable.Empty<string>();
     }
 
+    [Verb("delete-last", HelpText = "Delete the most recent cheep")]
+    class DeleteLastOptions { }
+
+
     class Program
     {
         private static readonly IDatabaseRepository<Cheep> _database = CreateDatabase();
@@ -29,7 +33,7 @@
                 return 1;
             }
 
-            var result = Parser.Default.ParseArguments<ReadOptions, CheepOptions>(args);
+            var result = Parser.Default.ParseArguments<ReadOptions, CheepOptions, DeleteLastOptions>(args);
             int exitCode = 1;
 
             result.MapResult(
@@ -44,6 +48,12 @@
                     AppendCheep(opts.Message.ToArray());
                     exitCode = 0;
                     return exitCode;
+                },
+                (DeleteLastOptions opts) =>
+                {
+                    DeleteLastCheep(); 
+                    return 0; 
+                    
                 },
                 errs =>
                 {
@@ -75,5 +85,10 @@
 
             _database.Store(cheep);
             Client.UserInterface.ShowCheepAdded(cheep);
+        }
+        
+        private static void DeleteLastCheep()
+        {
+            _database.DeleteLast();
         }
     }

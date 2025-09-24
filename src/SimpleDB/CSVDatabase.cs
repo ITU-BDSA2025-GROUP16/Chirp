@@ -16,6 +16,17 @@ public sealed class CSVDatabase<T> : IDatabaseRepository<T> where T : class
     {
         _filePath = filePath;
 
+        EnsureFileExists();
+    }
+    
+    public CSVDatabase(string filePath, bool forTest = true)
+    {
+        _filePath = filePath;
+        EnsureFileExists();
+    }
+
+    private void EnsureFileExists()
+    {
         if (!File.Exists(_filePath))
         {
             using var writer = new StreamWriter(_filePath);
@@ -38,7 +49,28 @@ public sealed class CSVDatabase<T> : IDatabaseRepository<T> where T : class
     {
         using var writer = new StreamWriter(_filePath, append: true);
         using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+        
+        if (new FileInfo(_filePath).Length == 0)
+        {
+            csv.WriteHeader<T>();
+            csv.NextRecord();
+        }
+        
         csv.NextRecord();
         csv.WriteRecord(record);
+    }
+    
+    public void DeleteLast()
+    {
+        var records = Read().ToList();
+        if (!records.Any()) return;
+
+        records.RemoveAt(records.Count - 1);
+
+        using var writer = new StreamWriter(_filePath, false);
+        using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+        csv.WriteHeader<T>();
+        writer.WriteLine();
+        csv.WriteRecords(records);
     }
 }

@@ -7,6 +7,7 @@ public static class UserInterface
     public static void ShowHelp()
     {
         Console.WriteLine("'dotnet run read' to read csv");
+        Console.WriteLine("'dotnet run delete-last to delete most recent cheep");
         Console.WriteLine("'dotnet run cheep \"text\"' to add new line to csv");
     }
 

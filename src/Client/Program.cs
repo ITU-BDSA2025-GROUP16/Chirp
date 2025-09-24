@@ -7,24 +7,24 @@ var client = new HttpClient { BaseAddress = new Uri("http://localhost:5080") };
 while (true)
 {
     Console.WriteLine("\nSelect an option:");
-    Console.WriteLine("1: Write a cheep");
-    Console.WriteLine("2: Read cheeps");
-    Console.WriteLine("0: Exit");
+    Console.WriteLine("Cheep: Write a cheep");
+    Console.WriteLine("Cheeps: Read cheeps");
+    Console.WriteLine("Exit: Exit");
     Console.Write("Choice: ");
 
     var input = Console.ReadLine();
 
-    if (input == "0" || input == null)
+    if (input == "Exit" || input == null)
     {
         break;
     }
 
     switch (input)
     {
-        case "1":
+        case "Cheep":
             await Cheep();
             break;
-        case "2":
+        case "Cheeps":
             await AddUser();
             break;
         default:
@@ -37,18 +37,15 @@ async Task Cheep()
 {
     try
     {
-        var users = await client.GetFromJsonAsync<List<User>>("/users");
-        if (users == null || users.Count == 0)
-        {
-            Console.WriteLine("No users found");
-            return;
-        }
+        var cheep = new Cheep
+            {
+                Author = Environment.UserName,
+                Message = await.,
+                Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+            };
 
-        Console.WriteLine("Cheep: ");
-        foreach (var user in users)
-        {
-            Console.WriteLine(user.Id + ": " + user.Name);
-        }
+            //_database.Store(cheep);
+            //Client.UserInterface.ShowCheepAdded(cheep);
     }
     catch (Exception e)
     {

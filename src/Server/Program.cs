@@ -24,6 +24,7 @@ app.MapPost("/cheeps", (Cheep newCheep) =>
     File.AppendAllText("../../data/chirp_cli_db.csv", $"{newCheep.Author}, {newCheep.Message}, {newCheep.Timestamp}");
     return Results.Created($"/users/{newCheep.Timestamp}", newCheep);
 });
+app.MapGet("/", () => "Chirp API is running!. Cheeps kommer senere, vi magtede ikke lige mere idag");
 
 app.Run();
 

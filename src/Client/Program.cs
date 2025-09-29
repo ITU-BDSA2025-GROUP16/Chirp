@@ -26,7 +26,6 @@ while (true)
             await Cheep();
             break;
         case "Cheeps":
-            Console.WriteLine("How many cheeps do you want to read? (or press Enter to read all)");
             await ReadCheeps();
             break;
         default:
@@ -67,58 +66,29 @@ async Task Cheep()
 
 async Task ReadCheeps()
 {
-    var cheepCountInput = Console.ReadLine();
-    if (!string.IsNullOrWhiteSpace(cheepCountInput) && int.TryParse(cheepCountInput, out int cheepCount))
+    try
     {
-        try
+        var response = await client.GetAsync("/cheeps");
+        if (!response.IsSuccessStatusCode)
         {
-            var response = await client.GetAsync($"/cheeps?count={cheepCount}");
-            if (!response.IsSuccessStatusCode)
-            {
-                Console.WriteLine("Failed to fetch cheeps. Status code: " + response.StatusCode);
-                return;
-            }
-
-            var cheeps = await response.Content.ReadFromJsonAsync<List<Cheep>>();
-            if (cheeps != null)
-            {
-                foreach (var cheep in cheeps)
-                {
-                    Console.WriteLine($"[{DateTimeOffset.FromUnixTimeSeconds(cheep.Timestamp)}] {cheep.Author}: {cheep.Message}");
-                }
-            }
+            Console.WriteLine("Failed to fetch cheeps. Status code: " + response.StatusCode);
+            return;
         }
-        catch (Exception e)
+
+        var cheeps = await response.Content.ReadFromJsonAsync<List<Cheep>>();
+        if (cheeps != null)
         {
-            Console.WriteLine("ERROR: " + e.Message);
+            foreach (var cheep in cheeps)
+            {
+                Console.WriteLine($"[{DateTimeOffset.FromUnixTimeSeconds(cheep.Timestamp)}] {cheep.Author}: {cheep.Message}");
+            }
         }
     }
-    else
+    catch (Exception e)
     {
-        try
-        {
-            var response = await client.GetAsync("/cheeps");
-            if (!response.IsSuccessStatusCode)
-            {
-                Console.WriteLine("Failed to fetch cheeps. Status code: " + response.StatusCode);
-                return;
-            }
-
-            var cheeps = await response.Content.ReadFromJsonAsync<List<Cheep>>();
-            if (cheeps != null)
-            {
-                foreach (var cheep in cheeps)
-                {
-                    Console.WriteLine($"[{DateTimeOffset.FromUnixTimeSeconds(cheep.Timestamp)}] {cheep.Author}: {cheep.Message}");
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("ERROR: " + e.Message);
-        }
-    } 
- }
+        Console.WriteLine("ERROR: " + e.Message);
+    }
+}
 
 public class Cheep
 {

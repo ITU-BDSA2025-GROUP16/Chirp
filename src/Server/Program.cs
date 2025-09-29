@@ -1,10 +1,20 @@
 
 
-var app = WebApplication.Create();
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+
+var dataPath = Path.Combine(AppContext.BaseDirectory, "data", "chirp_cli_db.csv");
+
+if (!File.Exists(dataPath))
+{
+    Directory.CreateDirectory(Path.GetDirectoryName(dataPath)!);
+    File.WriteAllText(dataPath, "Author,Message,Timestamp" + Environment.NewLine);
+}
+
 
 app.MapGet("/cheeps", () =>
 {
-    var lines = File.ReadAllLines("../../data/chirp_cli_db.csv");
+    var lines = File.ReadAllLines(dataPath);
 
     return lines
         .Skip(1)
@@ -21,7 +31,7 @@ app.MapGet("/cheeps", () =>
 
 app.MapPost("/cheeps", (Cheep newCheep) =>
 {
-    File.AppendAllText("../../data/chirp_cli_db.csv", $"{newCheep.Author}, {newCheep.Message}, {newCheep.Timestamp}");
+    File.AppendAllText(dataPath, $"{newCheep.Author}, {newCheep.Message}, {newCheep.Timestamp}");
     return Results.Created($"/users/{newCheep.Timestamp}", newCheep);
 });
 app.MapGet("/", () => "Chirp API is running!. Cheeps kommer senere, vi magtede ikke lige mere idag");

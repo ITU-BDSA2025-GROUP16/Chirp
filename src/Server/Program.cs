@@ -3,7 +3,13 @@
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
-var dataPath = Path.Combine(AppContext.BaseDirectory, "data", "chirp_cli_db.csv");
+// Detect if running in Azure
+var isAzure = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID"));
+
+// Use /home for Azure, current directory for localhost
+var dataPath = isAzure 
+    ? Path.Combine("/home", "data", "chirp_cli_db.csv")
+    : Path.Combine(Directory.GetCurrentDirectory(), "data", "chirp_cli_db.csv");
 
 if (!File.Exists(dataPath))
 {
@@ -11,28 +17,32 @@ if (!File.Exists(dataPath))
     File.WriteAllText(dataPath, "Author,Message,Timestamp" + Environment.NewLine);
 }
 
+app.MapPost("/cheeps", (Cheep newCheep) =>
+{
+    // No spaces after commas, and add newline at the end
+    File.AppendAllText(dataPath, $"{newCheep.Author},{newCheep.Message},{newCheep.Timestamp}{Environment.NewLine}");
+    return Results.Created($"/users/{newCheep.Timestamp}", newCheep);
+});
 
 app.MapGet("/cheeps", () =>
 {
     var lines = File.ReadAllLines(dataPath);
-
     return lines
         .Skip(1)
         .Where(line => !string.IsNullOrWhiteSpace(line))
-        .Select(line => line.Split(","))
-        .Select(parts => new Cheep
+        .Select(line => 
         {
-            Author = parts[0].Trim(),
-            Message = parts[1].Trim(),
-            Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds()
+            var lastCommaIndex = line.LastIndexOf(',');
+            var secondLastCommaIndex = line.LastIndexOf(',', lastCommaIndex - 1);
+            
+            return new Cheep
+            {
+                Author = line.Substring(0, secondLastCommaIndex).Trim(),
+                Message = line.Substring(secondLastCommaIndex + 1, lastCommaIndex - secondLastCommaIndex - 1).Trim(),
+                Timestamp = long.Parse(line.Substring(lastCommaIndex + 1).Trim())
+            };
         })
         .ToList();
-});
-
-app.MapPost("/cheeps", (Cheep newCheep) =>
-{
-    File.AppendAllText(dataPath, $"{newCheep.Author}, {newCheep.Message}, {newCheep.Timestamp}");
-    return Results.Created($"/users/{newCheep.Timestamp}", newCheep);
 });
 app.MapGet("/", () => "Chirp API is running!. Cheeps kommer senere, vi magtede ikke lige mere idag");
 

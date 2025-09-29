@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 
 
-var client = new HttpClient { BaseAddress = new Uri("http://localhost:5086") };
+var client = new HttpClient { BaseAddress = new Uri("https://bdsagroup16chirpremotedbklaphat5.azurewebsites.net") };
 
 while (true)
 {

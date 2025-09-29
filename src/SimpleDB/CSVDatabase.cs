@@ -8,7 +8,7 @@ public sealed class CSVDatabase<T> : IDatabaseRepository<T> where T : class
     private static readonly Lazy<CSVDatabase<T>> _lazyInstance =
         new Lazy<CSVDatabase<T>>(() => new CSVDatabase<T>("../../data/chirp_cli_db.csv"));
 
-    public static CSVDatabase<T> Instance => _lazyInstance.Value;
+    public static CSVDatabase<T> Instance => _lazyInstance.Value; //For tests idk
 
     private readonly string _filePath;
 

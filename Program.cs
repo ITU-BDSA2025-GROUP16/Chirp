@@ -2,6 +2,13 @@ using Microsoft.EntityFrameworkCore;
 using MyChat.Razor.data;
 
 var builder = WebApplication.CreateBuilder(args);
+// Determine SQLite DB path
+string dbPath = Environment.GetEnvironmentVariable("CHIRPDBPATH") 
+                ?? Path.Combine(Path.GetTempPath(), "chirp.db");
+// Register DBFacade
+builder.Services.AddSingleton(new DBFacade(dbPath));
+// Register CheepService
+builder.Services.AddScoped<ICheepService, CheepService>();
 
 // Load database connection via configuration
 string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -9,7 +16,6 @@ builder.Services.AddDbContext<ChatDBContext>(options => options.UseSqlite(connec
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddSingleton<ICheepService, CheepService>();
 
 
 var app = builder.Build();

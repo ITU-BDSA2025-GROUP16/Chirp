@@ -1,0 +1,74 @@
+using Microsoft.Data.Sqlite;
+
+public class DBFacade
+{
+    private readonly string _dbPath;
+
+    public DBFacade(string dbPath)
+    {
+        _dbPath = dbPath;
+    }
+
+    public List<CheepViewModel> GetCheeps()
+    {
+        var cheeps = new List<CheepViewModel>();
+        using var connection = new SqliteConnection($"Data Source={_dbPath}");
+        connection.Open();
+
+        var command = connection.CreateCommand();
+        command.CommandText =
+        @"
+            SELECT u.username, m.text, m.pub_date
+            FROM message m
+            JOIN user u ON m.author_id = u.user_id
+        ";
+
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            cheeps.Add(new CheepViewModel(
+                reader.GetString(0),
+                reader.GetString(1),
+                UnixTimeStampToDateTimeString(reader.GetInt64(2)) // convert pub_date
+            ));
+        }
+
+        return cheeps;
+    }
+
+    public List<CheepViewModel> GetCheepsFromAuthor(string author)
+    {
+        var cheeps = new List<CheepViewModel>();
+        using var connection = new SqliteConnection($"Data Source={_dbPath}");
+        connection.Open();
+
+        var command = connection.CreateCommand();
+        command.CommandText =
+        @"
+            SELECT u.username, m.text, m.pub_date
+            FROM message m
+            JOIN user u ON m.author_id = u.user_id
+            WHERE u.username = $author
+        ";
+        command.Parameters.AddWithValue("$author", author);
+
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            cheeps.Add(new CheepViewModel(
+                reader.GetString(0),
+                reader.GetString(1),
+                UnixTimeStampToDateTimeString(reader.GetInt64(2))
+            ));
+        }
+
+        return cheeps;
+    }
+
+    private static string UnixTimeStampToDateTimeString(long unixTimeStamp)
+    {
+        DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        dateTime = dateTime.AddSeconds(unixTimeStamp);
+        return dateTime.ToString("MM/dd/yy H:mm:ss");
+    }
+}

@@ -2,9 +2,9 @@
 
 public interface iMessageRepository
 {
-    Task CreateMessage(MessageDTO newMessage);
+  /*  Task CreateMessage(MessageDTO newMessage);
     Task<List<MeessageDTO>> ReadMessage(string UserName);
-    Task UpdateMessage(MessageDTO alteredMessage);
+    Task UpdateMessage(MessageDTO alteredMessage);*/
     
 
 }

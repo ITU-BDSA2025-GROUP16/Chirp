@@ -9,7 +9,7 @@ public class DBFacade
         _dbPath = dbPath;
     }
 
-    public List<CheepViewModel> GetCheeps()
+    public List<CheepViewModel> GetCheeps(int pageNumber = 1)
     {
         var cheeps = new List<CheepViewModel>();
         using var connection = new SqliteConnection($"Data Source={_dbPath}");
@@ -21,7 +21,14 @@ public class DBFacade
             SELECT u.username, m.text, m.pub_date
             FROM message m
             JOIN user u ON m.author_id = u.user_id
+            ORDER BY m.pub_date DESC 
+            LIMIT $limit OFFSET $offset
         ";
+        
+        int limit = 32;
+        int offset = (pageNumber - 1) * limit;
+        command.Parameters.AddWithValue("$limit", limit);
+        command.Parameters.AddWithValue("$offset", offset);
 
         using var reader = command.ExecuteReader();
         while (reader.Read())

@@ -7,15 +7,24 @@ public class UserTimelineModel : PageModel
 {
     private readonly ICheepService _service;
     public List<CheepViewModel> Cheeps { get; set; }
-
+    public int CurrentPage { get; set; } = 1;
     public UserTimelineModel(ICheepService service)
     {
         _service = service;
     }
 
-    public ActionResult OnGet(string author)
+    public void OnGet()
     {
-        Cheeps = _service.GetCheepsFromAuthor(author);
-        return Page();
+        int pageNumber = 1;
+        string pageQuery = HttpContext.Request.Query["page"];
+        if (!string.IsNullOrEmpty(pageQuery) && int.TryParse(pageQuery, out int parsedPage))
+        {
+            pageNumber = parsedPage > 0 ? parsedPage : 1;
+        }
+
+        CurrentPage = pageNumber;
+
+        // Fetch cheeps for this page
+        Cheeps = _service.GetCheeps(pageNumber);
     }
 }

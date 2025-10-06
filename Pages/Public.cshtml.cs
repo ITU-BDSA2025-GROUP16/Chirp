@@ -7,15 +7,24 @@ public class PublicModel : PageModel
 {
     private readonly ICheepService _service;
     public List<CheepViewModel> Cheeps { get; set; }
+    public int CurrentPage { get; set; } = 1;
 
     public PublicModel(ICheepService service)
     {
         _service = service;
     }
 
-    public ActionResult OnGet()
+    public void OnGet()
     {
-        Cheeps = _service.GetCheeps();
-        return Page();
+        int pageNumber = 1;
+        string pageQuery = HttpContext.Request.Query["page"];
+        if (!string.IsNullOrEmpty(pageQuery) && int.TryParse(pageQuery, out int parsedPage))
+        {
+            pageNumber = parsedPage > 0 ? parsedPage : 1;
+        }
+
+        CurrentPage = pageNumber;
+        Cheeps = _service.GetCheeps(pageNumber);
     }
+
 }

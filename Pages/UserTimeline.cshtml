@@ -3,12 +3,10 @@
 @{
     ViewData["Title"] = "Chirp!";
     Layout = "Shared/_Layout";
-    var routeName = HttpContext.GetRouteValue("author");
-    var query = HttpContext.Request.Query["page"];
 }
 
 <div>
-    <h2> @routeName's Timeline </h2>
+    <h2> @Model.Author's Timeline @Model.CurrentPage </h2>
 
     @if (Model.Cheeps.Any())
     {

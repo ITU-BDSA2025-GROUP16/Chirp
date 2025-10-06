@@ -8,6 +8,7 @@ public class UserTimelineModel : PageModel
     private readonly ICheepService _service;
     public List<CheepViewModel> Cheeps { get; set; }
     public int CurrentPage { get; set; } = 1;
+    public string Author { get; set; }
     public UserTimelineModel(ICheepService service)
     {
         _service = service;
@@ -15,6 +16,7 @@ public class UserTimelineModel : PageModel
 
     public void OnGet()
     {
+        Author = RouteData.Values["author"]?.ToString();
         int pageNumber = 1;
         string pageQuery = HttpContext.Request.Query["page"];
         if (!string.IsNullOrEmpty(pageQuery) && int.TryParse(pageQuery, out int parsedPage))
@@ -23,8 +25,9 @@ public class UserTimelineModel : PageModel
         }
 
         CurrentPage = pageNumber;
-
-        // Fetch cheeps for this page
-        Cheeps = _service.GetCheeps(pageNumber);
+        
+        Console.WriteLine(pageNumber);
+        
+        Cheeps = _service.GetCheepsFromAuthor(Author, pageNumber);
     }
 }

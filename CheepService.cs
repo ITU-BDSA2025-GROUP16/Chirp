@@ -3,7 +3,7 @@ public record CheepViewModel(string Author, string Message, string Timestamp);
 public interface ICheepService
 {
     public List<CheepViewModel> GetCheeps(int pageNumber = 1);
-    public List<CheepViewModel> GetCheepsFromAuthor(string author);
+    public List<CheepViewModel> GetCheepsFromAuthor(string author, int pageNumber = 1);
 }
 
 public class CheepService : ICheepService
@@ -24,9 +24,9 @@ public class CheepService : ICheepService
         return _db.GetCheeps(pageNumber);
     }
 
-    public List<CheepViewModel> GetCheepsFromAuthor(string author)
+    public List<CheepViewModel> GetCheepsFromAuthor(string author, int pageNumber = 1)
     {
-        return _db.GetCheepsFromAuthor(author);
+        return _db.GetCheepsFromAuthor(author, pageNumber);
     }
 
     private static string UnixTimeStampToDateTimeString(double unixTimeStamp)

@@ -29,6 +29,8 @@ public class DBFacade
         int offset = (pageNumber - 1) * limit;
         command.Parameters.AddWithValue("$limit", limit);
         command.Parameters.AddWithValue("$offset", offset);
+        
+        Console.WriteLine($"Page: {pageNumber}, Offset: {offset}, Limit: {limit}");
 
         using var reader = command.ExecuteReader();
         while (reader.Read())
@@ -43,7 +45,7 @@ public class DBFacade
         return cheeps;
     }
 
-    public List<CheepViewModel> GetCheepsFromAuthor(string author)
+    public List<CheepViewModel> GetCheepsFromAuthor(string author, int pageNumber = 1)
     {
         var cheeps = new List<CheepViewModel>();
         using var connection = new SqliteConnection($"Data Source={_dbPath}");
@@ -56,8 +58,18 @@ public class DBFacade
             FROM message m
             JOIN user u ON m.author_id = u.user_id
             WHERE u.username = $author
+            ORDER BY m.pub_date DESC 
+            LIMIT $limit OFFSET $offset
         ";
-        command.Parameters.AddWithValue("$author", author);
+        
+        int limit = 32;
+        int offset = (pageNumber - 1) * limit;
+        command.Parameters.Add("$author", SqliteType.Text).Value = author;
+        command.Parameters.Add("$limit", SqliteType.Integer).Value = limit;
+        command.Parameters.Add("$offset", SqliteType.Integer).Value = offset;
+
+        Console.WriteLine($"Author: {author}, Page: {pageNumber}, Offset: {offset}, Limit: {limit}");
+
 
         using var reader = command.ExecuteReader();
         while (reader.Read())

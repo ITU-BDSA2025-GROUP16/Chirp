@@ -6,6 +6,9 @@ name: Build and deploy ASP.Net Core app to Azure Web App - bdsagroup16chirpremot
 on:
   push:
     branches:
+      - main	
+  pull_request:
+    branches: 
       - main
   workflow_dispatch:
 
@@ -23,11 +26,14 @@ jobs:
         with:
           dotnet-version: '8.x'
 
+      - name: setting up databases
+        run: ./initDB.sh 	
+
       - name: Build with dotnet
-        run: dotnet build src/Server/ --configuration Release
+        run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish src/Server/ -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -62,5 +68,5 @@ jobs:
           app-name: 'bdsagroup16chirpremotedb'
           slot-name: 'Production'
           package: .
-
           
+

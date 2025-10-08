@@ -26,6 +26,9 @@ jobs:
         with:
           dotnet-version: '8.x'
 
+      - name: Give execute permission to initDB.sh
+        run: chmod +x ./initDB.sh    
+
       - name: setting up databases
         run: ./initDB.sh 	
 
@@ -69,4 +72,5 @@ jobs:
           slot-name: 'Production'
           package: .
           
+
 

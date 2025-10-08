@@ -70,8 +70,9 @@ jobs:
         with:
           app-name: 'bdsagroup16chirpremotedb'
           slot-name: 'Production'
-          package: ${{env.DOTNET_ROOT}}/myapp
+          package: ./myapp
           
+
 
 
 

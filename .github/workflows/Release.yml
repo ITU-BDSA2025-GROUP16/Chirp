@@ -3,11 +3,11 @@ name: Release Chirp
 on:
   push:
     tags:
-      - 'v*.*.*'
-  workflow_dispatch:
+      - 'v*.*.*' # Trigger on version tags like v1.0.0
+  workflow_dispatch: # Optional manual trigger
 
 permissions:
-  contents: write 
+  contents: write # Required for creating releases
 
 jobs:
   build:
@@ -38,7 +38,7 @@ jobs:
         run: dotnet restore MyChat.Razor.csproj
       
       - name: Build & Publish
-        run: dotnet publish MyChat.Razor.csproj --configuration Release --runtime ${{ matrix.runtime }} --self-contained true -p:PublishSingleFile=false -o ./artifacts/${{ matrix.runtime }}
+        run: dotnet publish MyChat.Razor.csproj --configuration Release --runtime ${{ matrix.runtime }} --self-contained false -o ./artifacts/${{ matrix.runtime }}
       
       - name: Include SQLite database
         if: runner.os != 'Windows'

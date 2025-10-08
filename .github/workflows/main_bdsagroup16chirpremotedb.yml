@@ -26,11 +26,11 @@ jobs:
         with:
           dotnet-version: '8.x'
 
-      #- name: Give execute permission to initDB.sh
-       # run: chmod +x ./initDB.sh    
+      - name: Give execute permission to initDB.sh
+        run: chmod +x ./initDB.sh    
 
-      #- name: setting up databases
-      #  run: ./initDB.sh 	
+      - name: setting up databases
+        run: ./initDB.sh 	
 
       - name: Build with dotnet
         run: dotnet build MyChat.Razor.csproj --configuration Release
@@ -78,6 +78,7 @@ jobs:
           slot-name: 'Production'
           package: ./myapp
           
+
 
 
 

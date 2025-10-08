@@ -10,7 +10,7 @@ namespace MyChat.Razor.data
         {
         }
 
-        public DbSet<User> Users { get; set; }
-        public DbSet<Message> Messages { get; set; }
+        public DbSet<Author> Users { get; set; }
+        public DbSet<Cheep> Messages { get; set; }
     }
 }

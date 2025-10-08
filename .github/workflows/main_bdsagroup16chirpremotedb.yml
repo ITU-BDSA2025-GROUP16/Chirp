@@ -33,7 +33,7 @@ jobs:
       #  run: ./initDB.sh 	
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: dotnet build MyChat.Razor.csproj --configuration Release
 
       - name: dotnet publish
         run: dotnet publish MyChat.Razor.csproj -c Release -o ./myapp
@@ -78,6 +78,7 @@ jobs:
           slot-name: 'Production'
           package: ./myapp
           
+
 
 
 

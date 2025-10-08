@@ -36,7 +36,7 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish MyChat.Razor/MyChat.Razor.csproj -c Release -o ./myapp
+        run: dotnet publish MyChat.Razor.csproj -c Release -o ./myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -78,6 +78,7 @@ jobs:
           slot-name: 'Production'
           package: ./myapp
           
+
 
 
 

@@ -3,33 +3,28 @@ name: Release Chirp
 on:
   push:
     tags:
-      - 'v*.*.*' # Trigger on version tags like v1.0.0
-  workflow_dispatch: # Optional manual trigger
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write 
 
 jobs:
-  release:
+  build:
     strategy:
       matrix:
         include:
           - os: ubuntu-latest
             runtime: linux-x64
-            arch: x64
-          - os: ubuntu-latest
-            runtime: linux-arm64
-            arch: arm64
           - os: windows-latest
             runtime: win-x64
-            arch: x64
-          - os: windows-latest
-            runtime: win-arm64
-            arch: arm64
           - os: macos-latest
             runtime: osx-x64
-            arch: x64
           - os: macos-latest
             runtime: osx-arm64
-            arch: arm64
+    
     runs-on: ${{ matrix.os }}
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -40,26 +35,63 @@ jobs:
           dotnet-version: '8.0.x'
       
       - name: Restore dependencies
-        run: dotnet restore ./src/Chirp.CLI
+        run: dotnet restore MyChat.Razor.csproj
       
       - name: Build & Publish
-        run: dotnet publish ./src/Chirp.CLI/Chirp.CLI.csproj --configuration Release --runtime ${{ matrix.runtime }} --self-contained false -o ./artifacts/${{ matrix.runtime }}
+        run: dotnet publish MyChat.Razor.csproj --configuration Release --runtime ${{ matrix.runtime }} --self-contained true -p:PublishSingleFile=false -o ./artifacts/${{ matrix.runtime }}
+      
+      - name: Include SQLite database
+        if: runner.os != 'Windows'
+        run: |
+          if [ -f chirp.db ]; then
+            cp chirp.db ./artifacts/${{ matrix.runtime }}/
+          fi
+        shell: bash
+      
+      - name: Include SQLite database (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          if (Test-Path chirp.db) {
+            Copy-Item chirp.db -Destination ./artifacts/${{ matrix.runtime }}/
+          }
+        shell: pwsh
       
       - name: Package as Zip (Unix)
         if: runner.os != 'Windows'
         run: |
           cd artifacts
-          zip -r ${{ matrix.runtime }}.zip ${{ matrix.runtime }}
+          zip -r Chirp-${{ matrix.runtime }}.zip ${{ matrix.runtime }}
       
       - name: Package as Zip (Windows)
         if: runner.os == 'Windows'
         run: |
           cd artifacts
-          Compress-Archive -Path ${{ matrix.runtime }} -DestinationPath ${{ matrix.runtime }}.zip
+          Compress-Archive -Path ${{ matrix.runtime }} -DestinationPath Chirp-${{ matrix.runtime }}.zip
         shell: pwsh
       
-      - name: Upload Release Artifact
+      - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Chirp-${{ matrix.runtime }}
-          path: ./artifacts/${{ matrix.runtime }}.zip
+          path: ./artifacts/Chirp-${{ matrix.runtime }}.zip
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./release-artifacts
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ./release-artifacts/**/*.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

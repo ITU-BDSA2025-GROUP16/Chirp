@@ -6,9 +6,6 @@ name: Build and deploy ASP.Net Core app to Azure Web App - bdsagroup16chirpremot
 on:
   push:
     branches:
-      - main	
-  pull_request:
-    branches: 
       - main
   workflow_dispatch:
 
@@ -26,23 +23,17 @@ jobs:
         with:
           dotnet-version: '8.x'
 
-      - name: Give execute permission to initDB.sh
-        run: chmod +x ./initDB.sh    
-
-      - name: setting up databases
-        run: ./initDB.sh 	
-
       - name: Build with dotnet
-        run: dotnet build MyChat.Razor.csproj --configuration Release
+        run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish MyChat.Razor.csproj -c Release -o ./myapp
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ./myapp/*
+          path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
     runs-on: ubuntu-latest
@@ -56,19 +47,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-          path: ./myapp
-          
-      - name: Verify downloaded artifact
-        run: |
-          echo "=== Artifact contents after download ==="
-          ls -la ./myapp
       
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_D3624169B3194EF68E271BB8BFE81916 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_9C2E4A3B0CB64C958049BA7AF3523E17 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8AAA7FA678154A9F82C596AA91A4E88A }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_43B6DBDF46F5488CA84F65050C96959F }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_3EB2463E304A4900A5D7B1A49753FC29 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_87638D9D0D6D4320A4BA2AB096CF66B8 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -76,18 +61,5 @@ jobs:
         with:
           app-name: 'bdsagroup16chirpremotedb'
           slot-name: 'Production'
-          package: ./myapp
+          package: .
           
-
-
-
-
-
-
-
-
-
-
-
-
-

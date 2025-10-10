@@ -9,5 +9,5 @@ public class Cheep
 
     // Foreign key + navigation property
     public int UserId { get; set; }
-    public Author author { get; set; }
+    public Author Author { get; set; }
 }

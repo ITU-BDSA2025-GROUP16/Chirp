@@ -4,7 +4,7 @@ using MyChat.Razor.data;
 var builder = WebApplication.CreateBuilder(args);
 // Determine SQLite DB path
 string dbPath = Environment.GetEnvironmentVariable("CHIRPDBPATH") 
-                ?? Path.Combine(Path.GetTempPath(), "chirp.db");
+                ?? Path.Combine(Path.GetTempPath(), "data", "chirp.db");
 // Register DBFacade
 builder.Services.AddSingleton(new DBFacade(dbPath));
 // Register CheepService
@@ -36,4 +36,7 @@ app.UseRouting();
 app.MapRazorPages();
 
 app.Run();
+
+
+public partial class Program { }
 

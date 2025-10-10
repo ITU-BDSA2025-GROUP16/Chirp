@@ -4,8 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using MyChat.Razor.data;
+using MyChat.Razor.Model; 
 
-namespace MyChat.Razor.Model;
+namespace MyChat.Razor.Tests;
 
 
 using Xunit;
@@ -18,7 +19,7 @@ public class Tests
 		var username = "Tester";
 		var email = "Tester@email.com";
 
-		var user = new User
+		var user = new Author
 		{
 			Id = userId,
 			Username = username,
@@ -33,7 +34,7 @@ public class Tests
 	[Fact]
 	public void UnitMessageCreatingTest()
 	{
-		var user = new User
+		var user = new Author
 		{
 			Id = 12345,
 			Username = "Tester",
@@ -42,19 +43,19 @@ public class Tests
 
 		var sentAt = DateTime.UtcNow;
 
-		var message = new Message
+		var message = new Cheep
 		{
 			Id = 99999,
 			Content = "Jeg hopper fra femte!",
 			SentAt = sentAt,
 			UserId = user.Id,
-			User = user
+			Author = user
 		};
 
 		Assert.Equal(99999, message.Id);
 		Assert.Equal("Jeg hopper fra femte!", message.Content);
 		Assert.Equal(user.Id, message.UserId);
-		Assert.Equal(user, message.User);
+		Assert.Equal(user, message.Author);
 		Assert.Equal(sentAt, message.SentAt);
 	}
 	

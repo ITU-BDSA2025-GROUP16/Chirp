@@ -68,3 +68,5 @@ packages/
 *.p12
 *.crt
 *.pem
+
+*.db

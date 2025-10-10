@@ -7,6 +7,8 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+      <OutputPath>$(SolutionDir)bin\$(MSBuildProjectName)\</OutputPath>
+      <IntermediateOutputPath>$(SolutionDir)obj\$(MSBuildProjectName)\</IntermediateOutputPath>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,5 +1,7 @@
 ﻿namespace MyChat.Razor.Model;
-public class Message
+
+public class Cheep
+
 {
     public int Id { get; set; }
     public string Content { get; set; }
@@ -7,5 +9,5 @@ public class Message
 
     // Foreign key + navigation property
     public int UserId { get; set; }
-    public User User { get; set; }
+    public Author Author { get; set; }
 }

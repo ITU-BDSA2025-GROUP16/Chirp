@@ -2,9 +2,9 @@ using System.Net;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 
-namespace MyChat.Tests;
+namespace MyChat.Razor.Tests;
 
-public class ApiTests : IClassFixture<WebApplicationFactory<Program>> //Large pats of these tests where made in collaboration with LLM
+public class ApiTests : IClassFixture<WebApplicationFactory<Program>> //parts of these tests where made in collaboration with LLM
 {
     private readonly WebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;

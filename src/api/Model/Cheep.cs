@@ -3,11 +3,11 @@
 public class Cheep
 
 {
-    public int Id { get; set; }
-    public string Content { get; set; }
-    public DateTime SentAt { get; set; }
+    public int CheepId { get; set; }
+    public string Text { get; set; }
+    public DateTime TimeStamp { get; set; }
 
     // Foreign key + navigation property
-    public int UserId { get; set; }
+    public int AuthorId { get; set; }
     public Author Author { get; set; }
 }

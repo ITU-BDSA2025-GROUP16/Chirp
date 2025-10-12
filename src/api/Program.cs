@@ -2,23 +2,34 @@ using Microsoft.EntityFrameworkCore;
 using MyChat.Razor.data;
 
 var builder = WebApplication.CreateBuilder(args);
+
 // Determine SQLite DB path
-string dbPath = Environment.GetEnvironmentVariable("CHIRPDBPATH") 
-                ?? Path.Combine(Path.GetTempPath(), "data", "chirp.db");
+string dbPath = Path.Combine(AppContext.BaseDirectory, "chirp.db");
+builder.Services.AddDbContext<ChatDBContext>(
+    options => options.UseSqlite($"Data Source={dbPath}"));
+
 // Register DBFacade
-builder.Services.AddSingleton(new DBFacade(dbPath));
+builder.Services.AddScoped<DBFacade>();
+
 // Register CheepService
 builder.Services.AddScoped<ICheepService, CheepService>();
 
-// Load database connection via configuration
-string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ChatDBContext>(options => options.UseSqlite(connectionString));
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var chirpContext = scope.ServiceProvider.GetRequiredService<ChatDBContext>();
+    if (chirpContext.Database.EnsureCreated())
+    {
+        DbInitializer.SeedDatabase(chirpContext);    
+    }
+    
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

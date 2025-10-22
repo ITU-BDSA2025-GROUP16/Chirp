@@ -1,15 +1,17 @@
-/*
-
-using Microsoft.Data.Sqlite;
-using MyChat.Razor.data;
+﻿namespace MyChat.Razor.chat.repository;
 using Microsoft.EntityFrameworkCore;
+using MyChat.Razor.data;
 
-public class DBFacade
+
+public class CheepRepository : iCheepRepository
 {
+
     private readonly ChatDBContext _context;
 
-
-
+    public CheepRepository(ChatDBContext context)
+    {
+        _context = context;
+    }
     public List<CheepViewModel> GetCheeps(int pageNumber = 1)
     {
         int limit = 32;
@@ -27,9 +29,7 @@ public class DBFacade
             ))
             .ToList();
     }
-
-    public List<CheepViewModel> GetCheepsFromAuthor(string author, int pageNumber = 1)
-    {
+    public List<CheepViewModel> GetCheepsFromAuthor(string author, int pageNumber = 1) {
         int limit = 32;
         int offset = (pageNumber - 1) * limit;
 
@@ -47,4 +47,3 @@ public class DBFacade
             .ToList();
     }
 }
-*/

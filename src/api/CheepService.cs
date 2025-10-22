@@ -1,3 +1,5 @@
+using MyChat.Razor.chat.repository;
+
 public record CheepViewModel(string Author, string Message, string Timestamp);
 
 public interface ICheepService
@@ -8,11 +10,11 @@ public interface ICheepService
 
 public class CheepService : ICheepService
 {
-    private readonly DBFacade _db;
+    private readonly CheepRepository _repo;
 
-    public CheepService(DBFacade db)
+    public CheepService(CheepRepository repository)
     {
-        _db = db;
+        _repo = repository;
     }
     
     
@@ -21,12 +23,12 @@ public class CheepService : ICheepService
     // These would normally be loaded from a database for example
     public List<CheepViewModel> GetCheeps(int pageNumber = 1)
     {
-        return _db.GetCheeps(pageNumber);
+        return _repo.GetCheeps(pageNumber);
     }
 
     public List<CheepViewModel> GetCheepsFromAuthor(string author, int pageNumber = 1)
     {
-        return _db.GetCheepsFromAuthor(author, pageNumber);
+        return _repo.GetCheepsFromAuthor(author, pageNumber);
     }
 
     private static string UnixTimeStampToDateTimeString(double unixTimeStamp)

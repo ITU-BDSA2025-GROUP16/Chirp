@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MyChat.Razor.data;
+using MyChat.Razor.chat.repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,10 +10,12 @@ builder.Services.AddDbContext<ChatDBContext>(
     options => options.UseSqlite($"Data Source={dbPath}"));
 
 // Register DBFacade
-builder.Services.AddScoped<DBFacade>();
+//builder.Services.AddScoped<DBFacade>();
 
 // Register CheepService
 builder.Services.AddScoped<ICheepService, CheepService>();
+
+builder.Services.AddScoped<iCheepRepository, CheepRepository>();
 
 
 // Add services to the container.

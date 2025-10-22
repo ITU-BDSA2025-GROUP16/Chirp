@@ -9,13 +9,10 @@ string dbPath = Path.Combine(AppContext.BaseDirectory, "chirp.db");
 builder.Services.AddDbContext<ChatDBContext>(
     options => options.UseSqlite($"Data Source={dbPath}"));
 
-// Register DBFacade
-//builder.Services.AddScoped<DBFacade>();
-
 // Register CheepService
 builder.Services.AddScoped<ICheepService, CheepService>();
 
-builder.Services.AddScoped<iCheepRepository, CheepRepository>();
+builder.Services.AddScoped<ICheepRepository, CheepRepository>();
 
 
 // Add services to the container.

@@ -10,9 +10,9 @@ public interface ICheepService
 
 public class CheepService : ICheepService
 {
-    private readonly CheepRepository _repo;
+    private readonly ICheepRepository _repo;
 
-    public CheepService(CheepRepository repository)
+    public CheepService(ICheepRepository repository)
     {
         _repo = repository;
     }

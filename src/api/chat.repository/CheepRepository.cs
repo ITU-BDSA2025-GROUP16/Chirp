@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MyChat.Razor.data;
 
 
-public class CheepRepository : iCheepRepository
+public class CheepRepository : ICheepRepository
 {
 
     private readonly ChatDBContext _context;

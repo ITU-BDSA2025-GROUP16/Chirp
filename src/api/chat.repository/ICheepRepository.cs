@@ -1,7 +1,7 @@
 ﻿namespace MyChat.Razor.chat.repository;
 using Microsoft.EntityFrameworkCore;
 
-public interface iCheepRepository
+public interface ICheepRepository
 {
   /*  Task CreateMessage(MessageDTO newMessage);
     Task<List<MeessageDTO>> ReadMessage(string UserName);

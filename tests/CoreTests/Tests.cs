@@ -12,6 +12,8 @@ namespace MyChat.Razor.Tests;
 using Xunit;
 public class Tests
 {
+	//Tests for the database
+	
 	[Fact]
 	public void UnitUserCreatingTest()
 	{
@@ -21,13 +23,13 @@ public class Tests
 
 		var user = new Author
 		{
-			Id = userId,
-			Username = username,
+			AuthorId = userId,
+			Name = username,
 			Email = email
 		};
 
-		Assert.Equal(userId, user.Id);
-		Assert.Equal(username, user.Username);
+		Assert.Equal(userId, user.AuthorId);
+		Assert.Equal(username, user.Name);
 		Assert.Equal(email, user.Email);
 	}
 
@@ -36,8 +38,8 @@ public class Tests
 	{
 		var user = new Author
 		{
-			Id = 12345,
-			Username = "Tester",
+			AuthorId = 12345,
+			Name = "Tester",
 			Email = "Tester@email.com"
 		};
 
@@ -45,57 +47,58 @@ public class Tests
 
 		var message = new Cheep
 		{
-			Id = 99999,
-			Content = "Jeg hopper fra femte!",
-			SentAt = sentAt,
-			UserId = user.Id,
+			CheepId = 99999,
+			Text = "Jeg hopper fra femte!",
+			TimeStamp = sentAt,
+			AuthorId = user.AuthorId,
 			Author = user
 		};
 
-		Assert.Equal(99999, message.Id);
-		Assert.Equal("Jeg hopper fra femte!", message.Content);
-		Assert.Equal(user.Id, message.UserId);
+		Assert.Equal(99999, message.CheepId);
+		Assert.Equal("Jeg hopper fra femte!", message.Text);
+		Assert.Equal(user.AuthorId, message.AuthorId);
 		Assert.Equal(user, message.Author);
-		Assert.Equal(sentAt, message.SentAt);
+		Assert.Equal(sentAt, message.TimeStamp);
 	}
 	
 	[Fact]
-	public void IntegrationMessageDataBaseTest() //This test was made with the help of LLM
+	public void IntegrationMessageDataBaseTest()
 	{
-		string testDbPath = Path.Combine(Path.GetTempPath(), $"testdb_{Guid.NewGuid()}.db");
-		
-		if (File.Exists(testDbPath))
-			File.Delete(testDbPath);
-		
-		using (var connection = new SqliteConnection($"Data Source={testDbPath}"))
-		{
-			connection.Open();
-			var command = connection.CreateCommand(); //Need to add method for cheeping into db
-			command.CommandText = @" 
-                CREATE TABLE user (
-                    user_id INTEGER PRIMARY KEY,
-                    username TEXT,
-                    email TEXT,
-                    password TEXT
-                );
-                CREATE TABLE message (
-                    message_id INTEGER PRIMARY KEY,
-                    author_id INTEGER,
-                    text TEXT,
-                    pub_date INTEGER
-                );
-                INSERT INTO user VALUES(1,'Roger Histand','Roger+Histand@hotmail.com','AZ0serCHTCtJWR+sQCF4MhhfYLyLuK9tU4bWVy0AOBU=');
-                INSERT INTO message VALUES(13,1,'You are here for at all?',1690895598);
-            ";
-			command.ExecuteNonQuery();
-		}
-
+		var options = new DbContextOptionsBuilder<ChatDBContext>()
+			.UseSqlite("Data Source=:memory:")
+			.Options;
+    
+		using var context = new ChatDBContext(options);
+		context.Database.OpenConnection(); 
+		context.Database.EnsureCreated();  
+    
+		var a1 = new Author() 
+		{ 
+			AuthorId = 1, 
+			Name = "Roger Histand", 
+			Email = "Roger+Histand@hotmail.com", 
+			Cheeps = new List<Cheep>() 
+		};
+    
+		var c1 = new Cheep() 
+		{ 
+			CheepId = 13, 
+			AuthorId = a1.AuthorId, 
+			Author = a1, 
+			Text = "You are here for at all?", 
+			TimeStamp = DateTimeOffset.FromUnixTimeSeconds(1690895598).UtcDateTime
+		};
+    
+		context.Authors.Add(a1);
+		context.Cheeps.Add(c1);
+		context.SaveChanges();
+    
+		var facade = new DBFacade(context);
+		var cheeps = facade.GetCheeps();
+    
 		DateTimeOffset dateTime = DateTimeOffset.FromUnixTimeSeconds(1690895598);
 		string formatted = dateTime.UtcDateTime.ToString("MM/dd/yy H:mm:ss");
-		
-		var facade = new DBFacade(testDbPath);
-		var cheeps = facade.GetCheeps();
-
+    
 		Assert.Single(cheeps);
 		Assert.Equal("Roger Histand", cheeps[0].Author);
 		Assert.Equal("You are here for at all?", cheeps[0].Message);
@@ -104,51 +107,75 @@ public class Tests
 	
 	
 	[Fact]
-	public void IntegrationMessageByUserDataBaseTest()
-	{
-		var dbPath = Path.Combine(Path.GetTempPath(), $"testdb_{Guid.NewGuid()}.db");
-		
-		if (File.Exists(dbPath)) 
-			File.Delete(dbPath);
-
-		using (var connection = new SqliteConnection($"Data Source={dbPath}"))
-		{
-			connection.Open();
-			var command = connection.CreateCommand();
-			command.CommandText = @" 
-                CREATE TABLE user (
-                    user_id INTEGER PRIMARY KEY,
-                    username TEXT,
-                    email TEXT,
-                    password TEXT
-                );
-                CREATE TABLE message (
-                    message_id INTEGER PRIMARY KEY,
-                    author_id INTEGER,
-                    text TEXT,
-                    pub_date INTEGER
-                );
-            INSERT INTO user VALUES(1,'Roger Histand','Roger+Histand@hotmail.com','AZ0serCHTCtJWR+sQCF4MhhfYLyLuK9tU4bWVy0AOBU=');
-			INSERT INTO user VALUES(2,'Luanna Muro','Luanna-Muro@ku.dk','iuN9GA9kRoMQW54696JGUML74QKYNKFaG9mFNozJzqQ=');
-            INSERT INTO message VALUES(13,1,'You are here for at all?',1690895598);
-			INSERT INTO message VALUES(7,2,'It was but a very ancient cluster of blocks generally painted green, and for no other, he shielded me.',1690895641);
-			INSERT INTO message VALUES(56,2,'See how that murderer could be from any trivial business not connected with her.',1690895601);
-        ";
-			command.ExecuteNonQuery();
-		}
-
-		var db = new DBFacade(dbPath);
-		var service = new CheepService(db);
-
-		// Act
-		var cheeps = service.GetCheepsFromAuthor("Luanna Muro");
-
-		// Assert
-		Assert.Equal(2, cheeps.Count);
-		Assert.Equal("Luanna Muro", cheeps[0].Author);
-		Assert.Equal("Luanna Muro", cheeps[1].Author);
-		Assert.Equal("It was but a very ancient cluster of blocks generally painted green, and for no other, he shielded me.", cheeps[0].Message);
-		Assert.Equal("See how that murderer could be from any trivial business not connected with her.", cheeps[1].Message);
-
-	}
+public void IntegrationMessageByUserDataBaseTest()
+{
+    var options = new DbContextOptionsBuilder<ChatDBContext>()
+        .UseSqlite("Data Source=:memory:")
+        .Options;
+    
+    using var context = new ChatDBContext(options);
+    context.Database.OpenConnection(); 
+    context.Database.EnsureCreated();  
+    
+    var a1 = new Author() 
+    { 
+        AuthorId = 1, 
+        Name = "Roger Histand", 
+        Email = "Roger+Histand@hotmail.com", 
+        Cheeps = new List<Cheep>() 
+    };
+    
+    var a2 = new Author() 
+    { 
+        AuthorId = 2, 
+        Name = "Luanna Muro", 
+        Email = "Luanna-Muro@ku.dk", 
+        Cheeps = new List<Cheep>() 
+    };
+    
+    var c1 = new Cheep() 
+    { 
+        CheepId = 13, 
+        AuthorId = a1.AuthorId, 
+        Author = a1, 
+        Text = "You are here for at all?", 
+        TimeStamp = DateTimeOffset.FromUnixTimeSeconds(1690895598).UtcDateTime
+    };
+    
+    var c2 = new Cheep() 
+    { 
+        CheepId = 7, 
+        AuthorId = a2.AuthorId, 
+        Author = a2, 
+        Text = "It was but a very ancient cluster of blocks generally painted green, and for no other, he shielded me.", 
+        TimeStamp = DateTimeOffset.FromUnixTimeSeconds(1690895641).UtcDateTime
+    };
+    
+    var c3 = new Cheep() 
+    { 
+        CheepId = 56, 
+        AuthorId = a2.AuthorId, 
+        Author = a2, 
+        Text = "See how that murderer could be from any trivial business not connected with her.", 
+        TimeStamp = DateTimeOffset.FromUnixTimeSeconds(1690895601).UtcDateTime
+    };
+    
+    context.Authors.Add(a1);
+    context.Authors.Add(a2);
+    context.Cheeps.Add(c1);
+    context.Cheeps.Add(c2);
+    context.Cheeps.Add(c3);
+    context.SaveChanges();
+    
+    var db = new DBFacade(context);
+    var service = new CheepService(db);
+    
+    var cheeps = service.GetCheepsFromAuthor("Luanna Muro");
+    
+    Assert.Equal(2, cheeps.Count);
+    Assert.Equal("Luanna Muro", cheeps[0].Author);
+    Assert.Equal("Luanna Muro", cheeps[1].Author);
+    Assert.Equal("It was but a very ancient cluster of blocks generally painted green, and for no other, he shielded me.", cheeps[0].Message);
+    Assert.Equal("See how that murderer could be from any trivial business not connected with her.", cheeps[1].Message);
+}
 }

@@ -6,7 +6,7 @@ namespace MyChat.Razor.Pages;
 public class PublicModel : PageModel
 {
     private readonly ICheepService _service;
-    public List<CheepViewModel> Cheeps { get; set; }
+    public List<CheepViewModel> Cheeps { get; set; } = new();
     public int CurrentPage { get; set; } = 1;
 
     public PublicModel(ICheepService service)
@@ -17,7 +17,7 @@ public class PublicModel : PageModel
     public void OnGet()
     {
         int pageNumber = 1;
-        string pageQuery = HttpContext.Request.Query["page"];
+        string? pageQuery = HttpContext.Request.Query["page"];
         if (!string.IsNullOrEmpty(pageQuery) && int.TryParse(pageQuery, out int parsedPage))
         {
             pageNumber = parsedPage > 0 ? parsedPage : 1;

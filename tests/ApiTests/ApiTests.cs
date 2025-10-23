@@ -4,8 +4,9 @@ using Xunit;
 
 namespace MyChat.Razor.Tests;
 
-public class ApiTests : IClassFixture<WebApplicationFactory<Program>> //parts of these tests where made in collaboration with LLM
+public class ApiTests : IClassFixture<WebApplicationFactory<Program>> 
 {
+    //Tests for website using temporary version
     private readonly WebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
 
@@ -18,10 +19,8 @@ public class ApiTests : IClassFixture<WebApplicationFactory<Program>> //parts of
     [Fact]
     public async Task PublicTimeline_ReturnsSuccessStatusCode()
     {
-        // Act
         var response = await _client.GetAsync("/");
 
-        // Assert
         response.EnsureSuccessStatusCode();
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -29,21 +28,17 @@ public class ApiTests : IClassFixture<WebApplicationFactory<Program>> //parts of
     [Fact]
     public async Task PublicTimeline_ContainsHelgeCheep()
     {
-        // Act
         var response = await _client.GetAsync("/Roger%20Histand");
         var content = await response.Content.ReadAsStringAsync();
 
-        // Assert
         Assert.Contains("understand", content);
     }
 
     [Fact]
     public async Task UserTimeline_Adrian_ReturnsSuccessStatusCode()
     {
-        // Act
         var response = await _client.GetAsync("/Adrian");
 
-        // Assert
         response.EnsureSuccessStatusCode();
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -51,11 +46,9 @@ public class ApiTests : IClassFixture<WebApplicationFactory<Program>> //parts of
     [Fact]
     public async Task UserTimeline_Adrian_ContainsAdrianCheep()
     {
-        // Act
         var response = await _client.GetAsync("/Adrian");
         var content = await response.Content.ReadAsStringAsync();
 
-        // Assert
         Assert.Contains("Adrian", content);
         Assert.Contains("Hej, velkommen til kurset.", content);
     }
@@ -63,22 +56,18 @@ public class ApiTests : IClassFixture<WebApplicationFactory<Program>> //parts of
     [Fact]
     public async Task PublicTimeline_ContainsPublicTimelineHeader()
     {
-        // Act
         var response = await _client.GetAsync("/");
         var content = await response.Content.ReadAsStringAsync();
 
-        // Assert
         Assert.Contains("Public Timeline", content);
     }
 
     [Fact]
     public async Task UserTimeline_ContainsUsernameInHeader()
     {
-        // Act
         var response = await _client.GetAsync("/Adrian");
         var content = await response.Content.ReadAsStringAsync();
 
-        // Assert
         Assert.Contains("Hej, velkommen til kurset.", content);
     }
 
@@ -88,7 +77,6 @@ public class ApiTests : IClassFixture<WebApplicationFactory<Program>> //parts of
         var response = await _client.GetAsync("/?page=2");
         var content = await response.Content.ReadAsStringAsync();
 
-        // Assert
         response.EnsureSuccessStatusCode();
         Assert.Contains("Public Timeline - Page 2", content);
     }

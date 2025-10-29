@@ -1,4 +1,5 @@
 ﻿namespace MyChat.Razor.Model;
+using System.ComponentModel.DataAnnotations;
 
 public class Cheep
 

@@ -4,6 +4,8 @@ public class Cheep
 
 {
     public int CheepId { get; set; }
+    
+    [Required]
     public string Text { get; set; } = string.Empty;
     public DateTime TimeStamp { get; set; }
 

@@ -8,7 +8,7 @@ using MyChat.Razor.Model;
 
 namespace MyChat.Razor.Tests;
 
-
+using MyChat.Razor.chat.repository;
 using Xunit;
 public class Tests
 {
@@ -93,7 +93,7 @@ public class Tests
 		context.Cheeps.Add(c1);
 		context.SaveChanges();
     
-		var facade = new DBFacade(context);
+		var facade = new CheepRepository(context);
 		var cheeps = facade.GetCheeps();
     
 		DateTimeOffset dateTime = DateTimeOffset.FromUnixTimeSeconds(1690895598);
@@ -167,7 +167,7 @@ public void IntegrationMessageByUserDataBaseTest()
     context.Cheeps.Add(c3);
     context.SaveChanges();
     
-    var db = new DBFacade(context);
+    var db = new CheepRepository(context);
     var service = new CheepService(db);
     
     var cheeps = service.GetCheepsFromAuthor("Luanna Muro");

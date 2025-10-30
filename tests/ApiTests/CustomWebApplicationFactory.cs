@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using MyChat.Razor.data;
+using MyChat.Razor.chat.repository;
 
 namespace MyChat.Tests;
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
@@ -23,7 +24,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 services.Remove(dbContextServiceDescriptor);
 
             var facadeDescriptor = services.SingleOrDefault(
-                d => d.ServiceType == typeof(DBFacade));
+                d => d.ServiceType == typeof(CheepRepository));
             if (facadeDescriptor != null)
                 services.Remove(facadeDescriptor);
 

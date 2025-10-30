@@ -1,4 +1,6 @@
 ﻿using Chirp.Core.Domain;
+using Chirp.Core.Services;
+using Chirp.Core.Interfaces;
 
 namespace Chirp.Infrastructure.Data;
 

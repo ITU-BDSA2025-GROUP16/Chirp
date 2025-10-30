@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Chirp.Infrastructure.Data.Migrations;
+namespace MyChat.Razor.Migrations
 {
     /// <inheritdoc />
     public partial class AddCheepTextLengthConstraint : Migration

@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MyChat.Razor.data;
+using Chirp.Infrastructure.Data;
 
 #nullable disable
 
-namespace Chirp.Infrastructure.Data.Migrations;
+namespace MyChat.Razor.Migrations
 {
     [DbContext(typeof(ChatDBContext))]
     [Migration("20251029123019_AddCheepTextLengthConstraint")]

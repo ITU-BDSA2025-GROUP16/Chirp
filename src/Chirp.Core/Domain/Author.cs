@@ -1,5 +1,4 @@
-﻿namespace MyChat.Razor.Model;
-
+﻿namespace Chirp.Core.Domain;
 public class Author
 {
     public int AuthorId { get; set; }  // EF Core will consider this the primary key by convention

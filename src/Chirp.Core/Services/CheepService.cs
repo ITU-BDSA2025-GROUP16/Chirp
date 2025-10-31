@@ -1,4 +1,6 @@
-using MyChat.Razor.chat.repository;
+using Chirp.Core.Interfaces;
+
+namespace Chirp.Core.Services;
 
 public record CheepViewModel(string Author, string Message, string Timestamp);
 
@@ -16,10 +18,10 @@ public class CheepService : ICheepService
     {
         _repo = repository;
     }
-    
-    
-    
-    
+
+
+
+
     // These would normally be loaded from a database for example
     public List<CheepViewModel> GetCheeps(int pageNumber = 1)
     {

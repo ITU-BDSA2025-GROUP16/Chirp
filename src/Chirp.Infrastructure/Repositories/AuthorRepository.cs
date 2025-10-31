@@ -1,7 +1,11 @@
-namespace MyChat.Razor.chat.repository;
-using Microsoft.EntityFrameworkCore;
-using MyChat.Razor.data;
-using MyChat.Razor.Model;
+﻿using Microsoft.EntityFrameworkCore;
+using Chirp.Core.Interfaces;
+using Chirp.Infrastructure.Data;
+using Chirp.Core.Services;
+using Chirp.Core.Domain; 
+
+
+namespace Chirp.Infrastructure.Repositories;
 
 public class AuthorRepository : IAuthorRepository
 {
@@ -19,8 +23,8 @@ public class AuthorRepository : IAuthorRepository
         return _context.Authors
                    .FirstOrDefault(a => a.Name == name);
     }
-    
-     public Author? GetAuthorFromEmail(string email)
+
+    public Author? GetAuthorFromEmail(string email)
     {
         return _context.Authors
                    .FirstOrDefault(a => a.Email == email);

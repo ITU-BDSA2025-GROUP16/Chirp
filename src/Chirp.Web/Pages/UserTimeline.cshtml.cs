@@ -1,21 +1,24 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Chirp.Core.Services;
+using Chirp.Core.Interfaces;
 
-namespace MyChat.Razor.Pages;
+namespace Chirp.Web.Pages;
 
-public class PublicModel : PageModel
+public class UserTimelineModel : PageModel
 {
     private readonly ICheepService _service;
     public List<CheepViewModel> Cheeps { get; set; } = new();
     public int CurrentPage { get; set; } = 1;
-
-    public PublicModel(ICheepService service)
+    public string? Author { get; set; } = string.Empty;
+    public UserTimelineModel(ICheepService service)
     {
         _service = service;
     }
 
     public void OnGet()
     {
+        Author = RouteData.Values["author"]?.ToString();
         int pageNumber = 1;
         string? pageQuery = HttpContext.Request.Query["page"];
         if (!string.IsNullOrEmpty(pageQuery) && int.TryParse(pageQuery, out int parsedPage))
@@ -24,7 +27,16 @@ public class PublicModel : PageModel
         }
 
         CurrentPage = pageNumber;
-        Cheeps = _service.GetCheeps(pageNumber);
-    }
+        
+        Console.WriteLine(pageNumber);
+        
+        if (string.IsNullOrEmpty(Author))
+        {
+            Cheeps = new();
+            return;
+        }
 
+        Cheeps = _service.GetCheepsFromAuthor(Author, pageNumber);
+
+    }
 }

@@ -2,10 +2,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using MyChat.Razor.data;
-using MyChat.Razor.chat.repository;
+using Chirp.Infrastructure.Data;
+using Chirp.Infrastructure.Repositories;
+using Chirp.Core.Interfaces; 
 
-namespace MyChat.Tests;
+namespace Chirp.Web;
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
     //In memory instance of our website.

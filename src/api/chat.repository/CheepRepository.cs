@@ -1,7 +1,7 @@
 ﻿namespace MyChat.Razor.chat.repository;
 using Microsoft.EntityFrameworkCore;
 using MyChat.Razor.data;
-
+using MyChat.Razor.Model;
 
 public class CheepRepository : ICheepRepository
 {
@@ -29,7 +29,8 @@ public class CheepRepository : ICheepRepository
             ))
             .ToList();
     }
-    public List<CheepViewModel> GetCheepsFromAuthor(string author, int pageNumber = 1) {
+    public List<CheepViewModel> GetCheepsFromAuthor(string author, int pageNumber = 1)
+    {
         int limit = 32;
         int offset = (pageNumber - 1) * limit;
 
@@ -46,4 +47,6 @@ public class CheepRepository : ICheepRepository
             ))
             .ToList();
     }
+
+   
 }

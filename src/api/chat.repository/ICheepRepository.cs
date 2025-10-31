@@ -1,5 +1,6 @@
 ﻿namespace MyChat.Razor.chat.repository;
 using Microsoft.EntityFrameworkCore;
+using MyChat.Razor.Model;
 
 public interface ICheepRepository
 {
@@ -7,7 +8,8 @@ public interface ICheepRepository
     Task<List<MeessageDTO>> ReadMessage(string UserName);
     Task UpdateMessage(MessageDTO alteredMessage);*/
 
-    public List<CheepViewModel> GetCheeps(int pageNumber = 1);
-    public List<CheepViewModel> GetCheepsFromAuthor(string author, int pageNumber = 1);
+  public List<CheepViewModel> GetCheeps(int pageNumber = 1);
+  public List<CheepViewModel> GetCheepsFromAuthor(string author, int pageNumber = 1);
 
+ 
 }

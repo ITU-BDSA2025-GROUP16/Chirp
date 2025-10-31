@@ -24,7 +24,7 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: dotnet build Chirp.sln --configuration Release
+        run: dotnet build src/Chirp.Web/Chirp.Web.csproj --configuration Release
 
       - name: dotnet publish
         run: dotnet publish src/Chirp.Web/Chirp.Web.csproj -c Release -o ${{ env.DOTNET_ROOT }}/myapp

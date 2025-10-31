@@ -8,5 +8,6 @@ public interface IAuthorRepository
       Task<List<MeessageDTO>> ReadMessage(string UserName);
       Task UpdateMessage(MessageDTO alteredMessage);*/
     public Author? GetAuthorFromName(string name);
-  
+
+    public Author? GetAuthorFromEmail(string email);
 }

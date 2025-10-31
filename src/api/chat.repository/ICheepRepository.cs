@@ -11,5 +11,5 @@ public interface ICheepRepository
   public List<CheepViewModel> GetCheeps(int pageNumber = 1);
   public List<CheepViewModel> GetCheepsFromAuthor(string author, int pageNumber = 1);
 
- 
+  public void CreateCheep(string cheep, Author author);
 }

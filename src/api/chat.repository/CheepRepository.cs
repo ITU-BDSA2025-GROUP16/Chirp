@@ -48,5 +48,20 @@ public class CheepRepository : ICheepRepository
             .ToList();
     }
 
-   
+   public void CreateCheep(string cheepText, Author author)
+    {
+    //This method assumes that you are logged in, and therefore that the Author already exists!
+    
+    var cheep = new Cheep
+    {
+        Text = cheepText,
+        TimeStamp = DateTime.UtcNow,
+        Author = author
+    };
+
+    _context.Cheeps.Add(cheep);
+    _context.SaveChanges(); 
+    }
+
+
 }

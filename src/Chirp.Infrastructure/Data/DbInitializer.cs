@@ -1,6 +1,8 @@
-﻿using MyChat.Razor.Model;
+﻿using Chirp.Core.Domain;
+using Chirp.Core.Services;
+using Chirp.Core.Interfaces;
 
-namespace MyChat.Razor.data;
+namespace Chirp.Infrastructure.Data;
 
 using System;
 

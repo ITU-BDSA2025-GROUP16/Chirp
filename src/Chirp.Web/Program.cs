@@ -1,6 +1,8 @@
+using Chirp.Core.Interfaces;
+using Chirp.Core.Services;
+using Chirp.Infrastructure.Data;
+using Chirp.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
-using MyChat.Razor.data;
-using MyChat.Razor.chat.repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,4 +52,3 @@ app.Run();
 
 
 public partial class Program { }
-

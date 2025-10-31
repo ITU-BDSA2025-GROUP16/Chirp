@@ -35,10 +35,11 @@ jobs:
           dotnet-version: '8.0.x'
       
       - name: Restore dependencies
-        run: dotnet restore MyChat.Razor.csproj
+        run: dotnet restore Chirp.sln
       
       - name: Build & Publish
-        run: dotnet publish MyChat.Razor.csproj --configuration Release --runtime ${{ matrix.runtime }} --self-contained false -o ./artifacts/${{ matrix.runtime }}
+        run: dotnet publish src/Chirp.Web/Chirp.Web.csproj --configuration Release --runtime ${{ matrix.runtime }} --self-contained false -o ./artifacts/${{ matrix.runtime }}
+
       
       - name: Include SQLite database
         if: runner.os != 'Windows'

@@ -1,8 +1,9 @@
-﻿namespace MyChat.Razor.chat.repository;
-using Microsoft.EntityFrameworkCore;
-using MyChat.Razor.data;
+﻿using Microsoft.EntityFrameworkCore;
+using Chirp.Core.Interfaces;
+using Chirp.Infrastructure.Data;
+using Chirp.Core.Services;
 
-
+namespace Chirp.Infrastructure.Repositories;
 public class CheepRepository : ICheepRepository
 {
 

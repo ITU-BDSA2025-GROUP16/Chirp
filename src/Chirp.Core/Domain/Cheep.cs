@@ -1,11 +1,11 @@
-﻿namespace MyChat.Razor.Model;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
+namespace Chirp.Core.Domain;
 public class Cheep
 
 {
     public int CheepId { get; set; }
-    
+
     [Required]
     [MaxLength(160)]
     public string Text { get; set; } = string.Empty;

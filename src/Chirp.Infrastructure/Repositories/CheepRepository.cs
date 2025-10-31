@@ -1,7 +1,10 @@
+
 ﻿using Microsoft.EntityFrameworkCore;
 using Chirp.Core.Interfaces;
 using Chirp.Infrastructure.Data;
 using Chirp.Core.Services;
+using Chirp.Core.Domain; 
+
 
 namespace Chirp.Infrastructure.Repositories;
 public class CheepRepository : ICheepRepository
@@ -30,7 +33,8 @@ public class CheepRepository : ICheepRepository
             ))
             .ToList();
     }
-    public List<CheepViewModel> GetCheepsFromAuthor(string author, int pageNumber = 1) {
+    public List<CheepViewModel> GetCheepsFromAuthor(string author, int pageNumber = 1)
+    {
         int limit = 32;
         int offset = (pageNumber - 1) * limit;
 
@@ -47,4 +51,21 @@ public class CheepRepository : ICheepRepository
             ))
             .ToList();
     }
+
+   public void CreateCheep(string cheepText, Author author)
+    {
+    //This method assumes that you are logged in, and therefore that the Author already exists!
+    
+    var cheep = new Cheep
+    {
+        Text = cheepText,
+        TimeStamp = DateTime.UtcNow,
+        Author = author
+    };
+
+    _context.Cheeps.Add(cheep);
+    _context.SaveChanges(); 
+    }
+
+
 }

@@ -107,6 +107,83 @@ public class Tests
 	}
 
 
+
+
+	[Fact]
+	public void GetAuthorFromNameUnitTest()
+	{
+		//Act
+		var options = new DbContextOptionsBuilder<ChatDBContext>()
+				.UseSqlite("Data Source=:memory:")
+			   .Options;
+
+		using var context = new ChatDBContext(options);
+		context.Database.OpenConnection();
+		context.Database.EnsureCreated();
+
+		var author = new Author { AuthorId = 1, Name = "Test", Email = "test@test.com" };
+		context.Authors.Add(author);
+		context.SaveChanges();
+
+		var repo = new AuthorRepository(context);
+		var result = repo.GetAuthorFromName("Test");
+
+		//Assert
+		Assert.NotNull(result);
+		Assert.Equal("Test", result.Name);
+		Assert.Equal("test@test.com", result.Email);
+	}
+
+	[Fact]
+	public void GetAuthorFromEmailUnitTest()
+	{
+		//Act
+		var options = new DbContextOptionsBuilder<ChatDBContext>()
+				.UseSqlite("Data Source=:memory:")
+			   .Options;
+
+		using var context = new ChatDBContext(options);
+		context.Database.OpenConnection();
+		context.Database.EnsureCreated();
+
+		var author = new Author { AuthorId = 1, Name = "Test", Email = "test@test.com" };
+		context.Authors.Add(author);
+		context.SaveChanges();
+
+		var repo = new AuthorRepository(context);
+		var result = repo.GetAuthorFromEmail("test@test.com");
+
+		//Assert
+		Assert.NotNull(result);
+		Assert.Equal("Test", result.Name);
+		Assert.Equal("test@test.com", result.Email);
+	}
+	
+	[Fact]
+	public void CreateCheep_AddsCheepWithAuthor()
+	{
+		//Act
+    	var options = new DbContextOptionsBuilder<ChatDBContext>()
+        .UseSqlite("Data Source=:memory:")
+        .Options;
+
+    	using var context = new ChatDBContext(options);
+    	context.Database.OpenConnection();
+    	context.Database.EnsureCreated();
+
+    	var author = new Author { Name = "Test", Email = "test@test.com" };
+    	context.Authors.Add(author);
+    	context.SaveChanges();
+
+    	var repo = new CheepRepository(context);
+    	repo.CreateCheep("This is a test!", author);
+
+		//Assert
+		var cheep = context.Cheeps.Include(c => c.Author).FirstOrDefault();
+    	Assert.NotNull(cheep);
+    	Assert.Equal("This is a test!", cheep.Text);
+    	Assert.Equal(author.Name, cheep.Author.Name);
+}
 	[Fact]
 	public void IntegrationMessageByUserDataBaseTest()
 	{

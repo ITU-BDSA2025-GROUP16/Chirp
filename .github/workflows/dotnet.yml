@@ -20,10 +20,10 @@ jobs:
           dotnet-version: '8.0.x'   # Adjust to your project's target version
 
       - name: Restore dependencies
-        run: dotnet restore src/Chirp.Web/Chirp.Web.csproj
+        run: dotnet restore 
 
       - name: Build
-        run: dotnet build src/Chirp.Web/Chirp.Web.csproj --no-restore --configuration Release
+        run: dotnet build --configuration Release
 
       - name: Run CoreTests
         run: dotnet test tests/CoreTests/Testing.tests.csproj --no-build --verbosity normal

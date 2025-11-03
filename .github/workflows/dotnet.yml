@@ -17,16 +17,16 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'   # Adjust to your project's target version
+          dotnet-version: '8.0.x'
 
       - name: Restore dependencies
         run: dotnet restore 
 
       - name: Build
-        run: dotnet build --configuration Release
+        run: dotnet build --configuration Release --no-restore
 
       - name: Run CoreTests
-        run: dotnet test tests/CoreTests/Testing.tests.csproj --no-build --verbosity normal
+        run: dotnet test tests/CoreTests/Testing.tests.csproj --configuration Release --no-build --verbosity normal
 
       - name: Run ApiTests
-        run: dotnet test tests/ApiTests/ApiTests.csproj --no-build --verbosity normal
+        run: dotnet test tests/ApiTests/ApiTests.csproj --configuration Release --no-build --verbosity normal

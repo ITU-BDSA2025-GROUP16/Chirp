@@ -49,7 +49,6 @@ packages/
 *.suo
 *.sln.docstates
 # Visual Studio solution (not needed for VS Code)
-*.sln
 
 # -----------------------
 # Other

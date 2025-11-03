@@ -26,7 +26,7 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Run CoreTests
-        run: dotnet test tests/CoreTests/Testing.tests.csproj --configuration Release --no-build --verbosity normal
+        run: dotnet test tests/CoreTests/Testing.tests.csproj --configuration Release --verbosity normal
 
       - name: Run ApiTests
-        run: dotnet test tests/ApiTests/ApiTests.csproj --configuration Release --no-build --verbosity normal
+        run: dotnet test tests/ApiTests/ApiTests.csproj --configuration Release --verbosity normal

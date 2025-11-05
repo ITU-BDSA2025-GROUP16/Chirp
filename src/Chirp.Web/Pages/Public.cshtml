@@ -3,12 +3,31 @@
 @{
     ViewData["Title"] = "Chirp!";
     Layout = "Shared/_Layout";
-    
 }
 
 <div>
     <h2>Public Timeline - Page @Model.CurrentPage</h2>
 
+    <div class="navigation">
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div>
+                <a href="/@(User.Identity.Name)">my timeline</a> |
+                <a href="/">public timeline</a> |
+                <form method="post" action="/logout" style="display:inline">
+                    <button type="submit">logout [@User.Identity.Name]</button>
+                </form>
+            </div>
+        }
+        else
+        {
+            <div>
+                <a href="/">public timeline</a> |
+                <a href="/register">register</a> |
+                <a href="/signin-github">login with GitHub</a>
+            </div>
+        }
+    </div>
 
     @if (Model.Cheeps.Any())
     {
@@ -17,9 +36,7 @@
             {
                 <li>
                     <p>
-                        <strong>
-                            <a href="/@cheep.Author">@cheep.Author</a>
-                        </strong>
+                        <strong><a href="/@cheep.Author">@cheep.Author</a></strong>
                         @cheep.Message
                         <small>&mdash; @cheep.Timestamp</small>
                     </p>

@@ -28,5 +28,8 @@ public class PublicModel : PageModel
         CurrentPage = pageNumber;
         Cheeps = _service.GetCheeps(pageNumber);
     }
+    
+    
 
 }
+

@@ -20,7 +20,7 @@ builder.Services.AddScoped<ICheepRepository, CheepRepository>();
 // Add services to the container.
 builder.Services.AddRazorPages();
 
-
+builder.WebHost.UseUrls("http://localhost:5696");
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

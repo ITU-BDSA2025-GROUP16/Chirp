@@ -1,5 +1,6 @@
 using Chirp.Core.Interfaces;
 using Chirp.Core.Services;
+using Chirp.Core.Domain;
 using Chirp.Infrastructure.Data;
 using Chirp.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -9,11 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ChatDBContextConnection") ?? throw new InvalidOperationException("Connection string 'ChatDBContextConnection' not found.");;
 
 // Determine SQLite DB path
-string dbPath = Path.Combine(AppContext.BaseDirectory, "chirp.db");
+string dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "chirp.db");
 builder.Services.AddDbContext<ChatDBContext>(
     options => options.UseSqlite($"Data Source={dbPath}"));
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ChatDBContext>();
+builder.Services.AddDefaultIdentity<Author>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ChatDBContext>();
 
 // Register CheepService
 builder.Services.AddScoped<ICheepService, CheepService>();
@@ -27,14 +28,24 @@ builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
+// Ensure DB is created and seeded
 using (var scope = app.Services.CreateScope())
 {
     var chirpContext = scope.ServiceProvider.GetRequiredService<ChatDBContext>();
-    if (chirpContext.Database.EnsureCreated())
+
+    // Delete old DB in development if corrupted
+    if (!File.Exists(dbPath) || chirpContext.Database.CanConnect() == false)
     {
-        DbInitializer.SeedDatabase(chirpContext);    
+        if (File.Exists(dbPath)) File.Delete(dbPath);
+
+        chirpContext.Database.EnsureCreated();
+        DbInitializer.SeedDatabase(chirpContext);
     }
-    
+    else
+    {
+        // Optional: just seed if empty
+        DbInitializer.SeedDatabase(chirpContext);
+    }
 }
 
 // Configure the HTTP request pipeline.
@@ -47,11 +58,10 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
+app.UseAuthentication();    // for Identity
+app.UseAuthorization();     // for [Authorize] attributes
 app.MapRazorPages();
-
 app.Run();
 
 

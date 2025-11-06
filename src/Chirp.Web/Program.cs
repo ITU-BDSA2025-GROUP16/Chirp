@@ -3,13 +3,17 @@ using Chirp.Core.Services;
 using Chirp.Infrastructure.Data;
 using Chirp.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("ChatDBContextConnection") ?? throw new InvalidOperationException("Connection string 'ChatDBContextConnection' not found.");;
 
 // Determine SQLite DB path
 string dbPath = Path.Combine(AppContext.BaseDirectory, "chirp.db");
 builder.Services.AddDbContext<ChatDBContext>(
     options => options.UseSqlite($"Data Source={dbPath}"));
+
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ChatDBContext>();
 
 // Register CheepService
 builder.Services.AddScoped<ICheepService, CheepService>();

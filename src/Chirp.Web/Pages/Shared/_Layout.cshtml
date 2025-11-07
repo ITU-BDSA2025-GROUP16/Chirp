@@ -19,7 +19,7 @@
             if (User.Identity.IsAuthenticated)
             {
                 var user = await UserManager.GetUserAsync(User); // fetch full Author
-                displayName = user.Name;  // fallback to UserName
+                displayName = user?.Name ?? User.Identity.Name;  // fallback to UserName
             }
         }
 

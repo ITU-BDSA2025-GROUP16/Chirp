@@ -1,20 +1,25 @@
 using Chirp.Core.Interfaces;
 using Chirp.Core.Services;
+using Chirp.Core.Domain;
 using Chirp.Infrastructure.Data;
 using Chirp.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using AspNet.Security.OAuth.GitHub;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("ChatDBContextConnection") ?? throw new InvalidOperationException("Connection string 'ChatDBContextConnection' not found.");;
 
 // Determine SQLite DB path
 string dbPath = Path.Combine(AppContext.BaseDirectory, "chirp.db");
 builder.Services.AddDbContext<ChatDBContext>(
     options => options.UseSqlite($"Data Source={dbPath}"));
 
-// Register services
+builder.Services.AddDefaultIdentity<Author>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<ChatDBContext>();
+
+// Register CheepService
 builder.Services.AddScoped<ICheepService, CheepService>();
 builder.Services.AddScoped<ICheepRepository, CheepRepository>();
 builder.Services.AddRazorPages();
@@ -96,13 +101,24 @@ builder.Services.Configure<GitHubAuthenticationOptions>("GitHub", options =>
 
 var app = builder.Build();
 
-// Database initialization
+// Ensure DB is created and seeded
 using (var scope = app.Services.CreateScope())
 {
     var chirpContext = scope.ServiceProvider.GetRequiredService<ChatDBContext>();
-    if (chirpContext.Database.EnsureCreated())
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Author>>();
+
+    // Delete old DB in development if corrupted
+    if (!File.Exists(dbPath) || chirpContext.Database.CanConnect() == false)
     {
-        DbInitializer.SeedDatabase(chirpContext);
+        if (File.Exists(dbPath)) File.Delete(dbPath);
+
+        chirpContext.Database.EnsureCreated();
+        DbInitializer.SeedDatabase(chirpContext, userManager);
+    }
+    else
+    {
+        // Optional: just seed if empty
+        DbInitializer.SeedDatabase(chirpContext, userManager);
     }
 }
 
@@ -115,11 +131,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseStaticFiles();
 app.UseRouting();
-
-app.UseAuthentication();
-app.UseAuthorization();
-app.UseSession();
-
+app.UseAuthentication();    // for Identity
+app.UseAuthorization();     // for [Authorize] attributes
 app.MapRazorPages();
 
 app.Use(async (context, next) =>

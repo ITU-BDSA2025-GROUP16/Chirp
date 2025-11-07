@@ -4,14 +4,19 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UserSecretsId>d1b11316-c603-4ba3-ba6a-7214a91c33e0</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Chirp.Core\Chirp.Core.csproj" />
     <ProjectReference Include="..\Chirp.Infrastructure\Chirp.Infrastructure.csproj" />
+    
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.21" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.21" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />

@@ -19,20 +19,13 @@ public class ChatDBContext : IdentityDbContext<Author, IdentityRole<int>, int>
     {
         base.OnModelCreating(builder);
 
-        // Map AuthorId as PK for Author
-        builder.Entity<Author>(b =>
-        {
-            b.HasKey(a => a.AuthorId);
-            b.Property(a => a.Id).HasColumnName("AuthorId"); // Identity uses Id internally
-            b.HasMany(a => a.Cheeps)
-             .WithOne(c => c.Author)
-             .HasForeignKey(c => c.AuthorId);
-        });
-
-        // Configure Cheep
         builder.Entity<Cheep>(b =>
         {
             b.HasKey(c => c.CheepId);
+            b.HasOne(c => c.Author)
+             .WithMany(a => a.Cheeps)
+             .HasForeignKey(c => c.AuthorId)
+             .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

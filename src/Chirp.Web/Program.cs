@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ChatDBContextConnection") ?? throw new InvalidOperationException("Connection string 'ChatDBContextConnection' not found.");;
 
 // Determine SQLite DB path
-string dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "chirp.db");
+string dbPath = Path.Combine(AppContext.BaseDirectory, "chirp.db");
 builder.Services.AddDbContext<ChatDBContext>(
     options => options.UseSqlite($"Data Source={dbPath}"));
 

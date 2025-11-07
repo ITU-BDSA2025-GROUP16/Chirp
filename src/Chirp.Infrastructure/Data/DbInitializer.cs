@@ -5,10 +5,11 @@ using Chirp.Core.Interfaces;
 namespace Chirp.Infrastructure.Data;
 
 using System;
+using Microsoft.AspNetCore.Identity;
 
 public static class DbInitializer
 {
-    public static void SeedDatabase(ChatDBContext chirpContext)
+    public static void SeedDatabase(ChatDBContext chirpContext, UserManager<Author> userManager)
     {
         if (!(chirpContext.Authors.Any() && chirpContext.Cheeps.Any()))
         {
@@ -23,10 +24,13 @@ public static class DbInitializer
             var a9 = new Author() {Name = "Johnnie Calixto", Email = "Johnnie+Calixto@itu.dk", Cheeps = new List<Cheep>() };
             var a10 = new Author() {Name = "Jacqualine Gilcoine", Email = "Jacqualine.Gilcoine@gmail.com", Cheeps = new List<Cheep>() };
             var a11 = new Author() {Name = "Helge", Email = "ropf@itu.dk", Cheeps = new List<Cheep>() };
-            var a12 = new Author() {Name = "Adrian", Email = "adho@itu.dk", Cheeps = new List<Cheep>() };
+            var a12 = new Author() { Name = "Adrian", Email = "adho@itu.dk", Cheeps = new List<Cheep>() };
 
-            var authors = new List<Author>() { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12 };
-
+            var authors = new List<Author>() { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 };
+        
+            userManager.CreateAsync(a11, "LetM31n!").Wait();
+            userManager.CreateAsync(a12, "M32Want_Access").Wait();
+           
             var c1 = new Cheep() { CheepId = 1, AuthorId = a10.Id, Author = a10, Text = "They were married in Chicago, with old Smith, and was expected aboard every day; meantime, the two went past me.", TimeStamp = DateTime.Parse("2023-08-01 13:14:37") };
             var c2 = new Cheep() { CheepId = 2, AuthorId = a10.Id, Author = a10, Text = "And then, as he listened to all that''s left o'' twenty-one people.", TimeStamp = DateTime.Parse("2023-08-01 13:15:21") };
             var c3 = new Cheep() { CheepId = 3, AuthorId = a10.Id, Author = a10, Text = "In various enchanted attitudes, like the Sperm Whale.", TimeStamp = DateTime.Parse("2023-08-01 13:14:58") };

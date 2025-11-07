@@ -14,7 +14,7 @@ string dbPath = Path.Combine(AppContext.BaseDirectory, "chirp.db");
 builder.Services.AddDbContext<ChatDBContext>(
     options => options.UseSqlite($"Data Source={dbPath}"));
 
-builder.Services.AddDefaultIdentity<Author>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ChatDBContext>();
+builder.Services.AddDefaultIdentity<Author>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<ChatDBContext>();
 
 // Register CheepService
 builder.Services.AddScoped<ICheepService, CheepService>();
@@ -32,6 +32,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var chirpContext = scope.ServiceProvider.GetRequiredService<ChatDBContext>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Author>>();
 
     // Delete old DB in development if corrupted
     if (!File.Exists(dbPath) || chirpContext.Database.CanConnect() == false)
@@ -39,12 +40,12 @@ using (var scope = app.Services.CreateScope())
         if (File.Exists(dbPath)) File.Delete(dbPath);
 
         chirpContext.Database.EnsureCreated();
-        DbInitializer.SeedDatabase(chirpContext);
+        DbInitializer.SeedDatabase(chirpContext, userManager);
     }
     else
     {
         // Optional: just seed if empty
-        DbInitializer.SeedDatabase(chirpContext);
+        DbInitializer.SeedDatabase(chirpContext, userManager);
     }
 }
 

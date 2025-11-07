@@ -19,8 +19,6 @@ builder.Services.AddScoped<ICheepService, CheepService>();
 builder.Services.AddScoped<ICheepRepository, CheepRepository>();
 builder.Services.AddRazorPages();
 
-builder.WebHost.UseUrls("http://localhost:5696");
-
 // Session configuration
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();

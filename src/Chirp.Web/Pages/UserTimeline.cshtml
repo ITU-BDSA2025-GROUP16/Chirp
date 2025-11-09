@@ -7,7 +7,16 @@
 
 <div>
     <h2> @Model.Author's Timeline @Model.CurrentPage </h2>
-
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="cheepbox">
+        <h3>What's on your mind @User.Identity.Name?</h3>
+        <form method="post">
+            <input asp-for="NewCheepText" type="text">
+            <input type="submit" value="Share">
+        </form>
+    </div>
+}
         <div class=navigation>
             @if (User.Identity.IsAuthenticated)
             {

@@ -1,4 +1,4 @@
-
+﻿
 ﻿using Microsoft.EntityFrameworkCore;
 using Chirp.Core.Interfaces;
 using Chirp.Infrastructure.Data;
@@ -52,7 +52,7 @@ public class CheepRepository : ICheepRepository
             .ToList();
     }
 
-   public void CreateCheep(string cheepText, Author author)
+   public async Task CreateCheep(string cheepText, Author author)
     {
     //This method assumes that you are logged in, and therefore that the Author already exists!
     
@@ -64,7 +64,7 @@ public class CheepRepository : ICheepRepository
     };
 
     _context.Cheeps.Add(cheep);
-    _context.SaveChanges(); 
+    await _context.SaveChangesAsync(); 
     }
 
 

@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Logging;
 using Chirp.Core.Domain;
 
@@ -26,8 +28,13 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPost(string returnUrl = null)
         {
-            await _signInManager.SignOutAsync();
+            await _signInManager.SignOutAsync(); //identity
+
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme); //cookies
+
             _logger.LogInformation("User logged out.");
+
+
             if (returnUrl != null)
             {
                 return LocalRedirect(returnUrl);
@@ -36,8 +43,20 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
             {
                 // This needs to be a redirect so that the browser performs a new
                 // request and the identity for the user gets updated.
-                return RedirectToPage();
+                return Redirect("/");
             }
+        }
+
+        public async Task<IActionResult> OnGet()
+        {
+            await _signInManager.SignOutAsync();
+
+            // Sign out from cookie authentication (GitHub OAuth)
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            _logger.LogInformation("User logged out.");
+            
+            return Redirect("/");
         }
     }
 }

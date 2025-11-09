@@ -8,6 +8,10 @@ using AspNet.Security.OAuth.GitHub;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
+
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ChatDBContextConnection") ?? throw new InvalidOperationException("Connection string 'ChatDBContextConnection' not found.");;
@@ -60,9 +64,55 @@ builder.Services.AddAuthentication(options =>
 })
 .AddGitHub(options =>
 {
-    options.ClientId = builder.Configuration["authentication:github:clientId"];
-    options.ClientSecret = builder.Configuration["authentication:github:clientSecret"];
+    var clientId = builder.Configuration["authentication:github:clientId"];
+    var clientSecret = builder.Configuration["authentication:github:clientSecret"];
+    
+    if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
+    {
+        throw new InvalidOperationException(
+            $"GitHub OAuth not configured. ClientId: {(clientId == null ? "null" : "set")}, " +
+            $"ClientSecret: {(clientSecret == null ? "null" : "set")}");
+    }
+    
+    options.ClientId = clientId;
+    options.ClientSecret = clientSecret;
     options.CallbackPath = "/signin-github";
+    
+    options.Events.OnCreatingTicket = async context =>
+    {
+        var gitHubId = context.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userName = context.Principal.FindFirst(ClaimTypes.Name)?.Value;
+        var email = context.Principal.FindFirst(ClaimTypes.Email)?.Value;
+
+        // Sanitize user data
+        userName = string.IsNullOrWhiteSpace(userName) ? $"GitHubUser_{gitHubId}" : userName.Trim();
+        email = string.IsNullOrWhiteSpace(email) ? $"{userName}@unknown.githubuser" : email.Trim();
+
+        Console.WriteLine($"GitHub user logging in: {userName} (ID: {gitHubId})");
+
+        var dbContext = context.HttpContext.RequestServices.GetRequiredService<ChatDBContext>();
+
+        var existingAuthor = await dbContext.Authors
+            .FirstOrDefaultAsync(a => a.Name == userName);
+
+        if (existingAuthor == null)
+        {
+            var newAuthor = new Author
+            {
+                Name = userName,
+                Email = email
+            };
+
+            dbContext.Authors.Add(newAuthor);
+            await dbContext.SaveChangesAsync();
+
+            Console.WriteLine($"Created new author: {userName}");
+        }
+        else
+        {
+            Console.WriteLine($"Author already exists: {userName}");
+        }
+    };
     
     //EVEN MORE DEBUG!!
     options.Events = new OAuthEvents

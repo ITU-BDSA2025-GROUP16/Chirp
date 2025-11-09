@@ -77,76 +77,87 @@ builder.Services.AddAuthentication(options =>
     options.ClientId = clientId;
     options.ClientSecret = clientSecret;
     options.CallbackPath = "/signin-github";
+    options.SaveTokens = true;
     
-    options.Events.OnCreatingTicket = async context =>
-    {
-        var gitHubId = context.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var userName = context.Principal.FindFirst(ClaimTypes.Name)?.Value;
-        var email = context.Principal.FindFirst(ClaimTypes.Email)?.Value;
-
-        // Sanitize user data
-        userName = string.IsNullOrWhiteSpace(userName) ? $"GitHubUser_{gitHubId}" : userName.Trim();
-        email = string.IsNullOrWhiteSpace(email) ? $"{userName}@unknown.githubuser" : email.Trim();
-
-        Console.WriteLine($"GitHub user logging in: {userName} (ID: {gitHubId})");
-
-        var dbContext = context.HttpContext.RequestServices.GetRequiredService<ChatDBContext>();
-
-        var existingAuthor = await dbContext.Authors
-            .FirstOrDefaultAsync(a => a.Name == userName);
-
-        if (existingAuthor == null)
-        {
-            var newAuthor = new Author
-            {
-                Name = userName,
-                Email = email
-            };
-
-            dbContext.Authors.Add(newAuthor);
-            await dbContext.SaveChangesAsync();
-
-            Console.WriteLine($"Created new author: {userName}");
-        }
-        else
-        {
-            Console.WriteLine($"Author already exists: {userName}");
-        }
-    };
-    
-    //EVEN MORE DEBUG!!
     options.Events = new OAuthEvents
     {
-        OnRedirectToAuthorizationEndpoint = context =>
+        OnCreatingTicket = async context =>
         {
-            Console.WriteLine($"Redirecting to GitHub: {context.RedirectUri}");
-            context.Response.Redirect(context.RedirectUri);
+            var gitHubId = context.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userName = context.Principal.FindFirst(ClaimTypes.Name)?.Value;
+            var email = context.Principal.FindFirst(ClaimTypes.Email)?.Value;
+
+            userName = string.IsNullOrWhiteSpace(userName) ? $"GitHubUser_{gitHubId}" : userName.Trim();
+            email = string.IsNullOrWhiteSpace(email) ? $"{userName}@github.user" : email.Trim();
+
+            Console.WriteLine($"=== GitHub OAuth - Creating ticket for: {userName} (ID: {gitHubId}) ===");
+
+            var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<Author>>();
+            var signInManager = context.HttpContext.RequestServices.GetRequiredService<SignInManager<Author>>();
+            
+            // Check if user exists
+            var existingUser = await userManager.FindByLoginAsync("GitHub", gitHubId);
+            
+            if (existingUser == null)
+            {
+                // Check by username
+                existingUser = await userManager.FindByNameAsync(userName);
+                
+                if (existingUser == null)
+                {
+                    // Create new user
+                    var newAuthor = new Author
+                    {
+                        UserName = userName,
+                        Email = email,
+                        Name = userName,
+                        EmailConfirmed = true
+                    };
+
+                    var createResult = await userManager.CreateAsync(newAuthor);
+                    
+                    if (createResult.Succeeded)
+                    {
+                        Console.WriteLine($"✓ Created new user: {userName}");
+                        existingUser = newAuthor;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"✗ Failed to create user: {string.Join(", ", createResult.Errors.Select(e => e.Description))}");
+                        return;
+                    }
+                }
+                
+                // Add external login
+                var loginInfo = new UserLoginInfo("GitHub", gitHubId, "GitHub");
+                var addLoginResult = await userManager.AddLoginAsync(existingUser, loginInfo);
+                
+                if (addLoginResult.Succeeded)
+                {
+                    Console.WriteLine($"✓ Added GitHub login for: {userName}");
+                }
+                else
+                {
+                    Console.WriteLine($"✗ Failed to add login: {string.Join(", ", addLoginResult.Errors.Select(e => e.Description))}");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"✓ User already exists: {userName}");
+            }
+        },
+        
+        OnRemoteFailure = context =>
+        {
+            Console.WriteLine("=== OnRemoteFailure ===");
+            Console.WriteLine($"Error: {context.Failure?.Message}");
+            context.Response.Redirect("/");
+            context.HandleResponse();
             return Task.CompletedTask;
         }
     };
 });
 
-//MORE DEBUG
-
-builder.Services.Configure<GitHubAuthenticationOptions>("GitHub", options =>
-{
-    options.Events.OnCreatingTicket = context =>
-    {
-        Console.WriteLine("=== OnCreatingTicket SUCCESS ===");
-        Console.WriteLine($"Access Token: {context.AccessToken?.Substring(0, 10)}...");
-        return Task.CompletedTask;
-    };
-    
-    options.Events.OnRemoteFailure = context =>
-    {
-        Console.WriteLine("=== OnRemoteFailure ===");
-        Console.WriteLine($"Error: {context.Failure?.Message}");
-        Console.WriteLine($"Stack: {context.Failure?.StackTrace}");
-        context.Response.Redirect("/");
-        context.HandleResponse();
-        return Task.CompletedTask;
-    };
-});
 
 
 var app = builder.Build();

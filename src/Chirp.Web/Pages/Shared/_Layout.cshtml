@@ -18,9 +18,11 @@
             string displayName = "";
             if (User.Identity.IsAuthenticated)
             {
-                var user = await UserManager.GetUserAsync(User); // fetch full Author
-                displayName = user?.Name ?? User.Identity.Name;  // fallback to UserName
+                var user = await UserManager.GetUserAsync(User);
+                // Try Name first, then UserName, then fall back to Identity.Name
+                displayName = user?.Name ?? user?.UserName ?? User.Identity.Name;
             }
+
         }
 
         @if (User.Identity.IsAuthenticated)

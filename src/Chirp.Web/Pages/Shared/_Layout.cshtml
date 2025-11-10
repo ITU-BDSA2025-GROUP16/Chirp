@@ -18,9 +18,11 @@
             string displayName = "";
             if (User.Identity.IsAuthenticated)
             {
-                var user = await UserManager.GetUserAsync(User); // fetch full Author
-                displayName = user?.Name ?? User.Identity.Name;  // fallback to UserName
+                var user = await UserManager.GetUserAsync(User);
+                // Try Name first, then UserName, then fall back to Identity.Name
+                displayName = user?.Name ?? user?.UserName ?? User.Identity.Name;
             }
+
         }
 
         @if (User.Identity.IsAuthenticated)
@@ -28,14 +30,14 @@
             <div>
                 <a href="/@(displayName)">my timeline</a> |
                 <a href="/">public timeline</a> |
-                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Logout">logout [@displayName]</a>
+                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Logout">Logout [@displayName]</a>
             </div>
         }
         else
         {
             <div>
                 <a href="/">public timeline</a> |
-                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">register</a>
+                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
                 <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
             </div>
         }

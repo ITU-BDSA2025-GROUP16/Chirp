@@ -1,4 +1,5 @@
 using Chirp.Core.Interfaces;
+using Chirp.Core.Domain;
 
 namespace Chirp.Core.Services;
 
@@ -8,6 +9,7 @@ public interface ICheepService
 {
     public List<CheepViewModel> GetCheeps(int pageNumber = 1);
     public List<CheepViewModel> GetCheepsFromAuthor(string author, int pageNumber = 1);
+    public Task CreateCheep(Author author, string text);
 }
 
 public class CheepService : ICheepService
@@ -20,7 +22,10 @@ public class CheepService : ICheepService
     }
 
 
-
+    public async Task CreateCheep(Author author, string text)
+    {
+        await _repo.CreateCheep(text, author);
+    }
 
     // These would normally be loaded from a database for example
     public List<CheepViewModel> GetCheeps(int pageNumber = 1)

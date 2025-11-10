@@ -14,6 +14,7 @@ public class UserTimelineModel : PageModel
     public List<CheepViewModel> Cheeps { get; set; } = new();
     public int CurrentPage { get; set; } = 1;
     public string? Author { get; set; } = string.Empty;
+    [BindProperty]
     public string NewCheepText { get; set; } = string.Empty;
     public UserTimelineModel(ICheepService service, UserManager<Author> userManager)
     {
@@ -46,6 +47,7 @@ public class UserTimelineModel : PageModel
     }
     public async Task<IActionResult> OnPostAsync()
     {
+        Console.WriteLine("=== OnPostAsync Called ===");
         Author = RouteData.Values["author"]?.ToString();
 
         if (string.IsNullOrEmpty(Author))
@@ -54,10 +56,6 @@ public class UserTimelineModel : PageModel
         }
 
         var currentUser = await _userManager.GetUserAsync(User);
-        if (currentUser == null || currentUser.Name != Author)
-        {
-            return Forbid();
-        }
 
         if (string.IsNullOrWhiteSpace(NewCheepText) || NewCheepText.Length > 160)
         {
@@ -67,6 +65,6 @@ public class UserTimelineModel : PageModel
 
         await _service.CreateCheep(currentUser, NewCheepText);
 
-        return RedirectToPage($"/{currentUser.UserName}");
+        return Redirect("/");
     }
 }

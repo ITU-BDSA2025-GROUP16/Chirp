@@ -15,7 +15,6 @@ public class PublicModel : PageModel
     public string? Author { get; set; } = string.Empty;
     public List<CheepViewModel> Cheeps { get; set; } = new();
     public int CurrentPage { get; set; } = 1;
-    public string NewCheepText { get; set; } = string.Empty;
 
     public PublicModel(ICheepService service, UserManager<Author> userManager)
     {
@@ -61,33 +60,5 @@ public class PublicModel : PageModel
             throw;
         }
     }
-    
-    public async Task<IActionResult> OnPostAsync()
-    {
-        Author = RouteData.Values["author"]?.ToString();
-
-        if (string.IsNullOrEmpty(Author))
-        {
-            return Page();
-        }
-
-        var currentUser = await _userManager.GetUserAsync(User);
-        if (currentUser == null || currentUser.Name != Author)
-        {
-            return Forbid();
-        }
-
-        if (string.IsNullOrWhiteSpace(NewCheepText) || NewCheepText.Length > 160)
-        {
-            ModelState.AddModelError(string.Empty, "Cheep text must be between 1 and 160 characters.");
-            return Page();
-        }
-
-        await _service.CreateCheep(currentUser, NewCheepText);
-
-        return RedirectToPage($"/{currentUser.UserName}");
-    }
-    
-
 }
 

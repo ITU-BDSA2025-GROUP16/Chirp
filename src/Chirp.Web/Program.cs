@@ -8,6 +8,10 @@ using AspNet.Security.OAuth.GitHub;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
+
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ChatDBContextConnection") ?? throw new InvalidOperationException("Connection string 'ChatDBContextConnection' not found.");;
@@ -47,56 +51,51 @@ foreach (var kvp in builder.Configuration.AsEnumerable())
 Console.WriteLine("===========================");
 
 // Authentication
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = GitHubAuthenticationDefaults.AuthenticationScheme;
-})
-.AddCookie(options =>
-{
-    options.LoginPath = "/";
-    options.LogoutPath = "/logout";
-})
-.AddGitHub(options =>
-{
-    options.ClientId = builder.Configuration["authentication:github:clientId"];
-    options.ClientSecret = builder.Configuration["authentication:github:clientSecret"];
-    options.CallbackPath = "/signin-github";
-    
-    //EVEN MORE DEBUG!!
-    options.Events = new OAuthEvents
+builder.Services.AddAuthentication()
+    .AddGitHub(options =>
     {
-        OnRedirectToAuthorizationEndpoint = context =>
+        var clientId = builder.Configuration["authentication:github:clientId"];
+        var clientSecret = builder.Configuration["authentication:github:clientSecret"];
+        
+        if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
         {
-            Console.WriteLine($"Redirecting to GitHub: {context.RedirectUri}");
-            context.Response.Redirect(context.RedirectUri);
-            return Task.CompletedTask;
+            throw new InvalidOperationException(
+                $"GitHub OAuth not configured. ClientId: {(clientId == null ? "null" : "set")}, " +
+                $"ClientSecret: {(clientSecret == null ? "null" : "set")}");
         }
-    };
-});
+        
+        options.ClientId = clientId;
+        options.ClientSecret = clientSecret;
+        options.CallbackPath = "/signin-github";
+        options.SaveTokens = true;
+        
+        // Add SignInScheme to use Identity's external scheme
+        options.SignInScheme = IdentityConstants.ExternalScheme;
+        
+        options.Events = new OAuthEvents
+        {
+            OnCreatingTicket = async context =>
+            {
+                var gitHubId = context.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var userName = context.Principal.FindFirst(ClaimTypes.Name)?.Value;
+                var email = context.Principal.FindFirst(ClaimTypes.Email)?.Value;
 
-//MORE DEBUG
+                userName = string.IsNullOrWhiteSpace(userName) ? $"GitHubUser_{gitHubId}" : userName.Trim();
+                email = string.IsNullOrWhiteSpace(email) ? $"{userName}@github.user" : email.Trim();
 
-builder.Services.Configure<GitHubAuthenticationOptions>("GitHub", options =>
-{
-    options.Events.OnCreatingTicket = context =>
-    {
-        Console.WriteLine("=== OnCreatingTicket SUCCESS ===");
-        Console.WriteLine($"Access Token: {context.AccessToken?.Substring(0, 10)}...");
-        return Task.CompletedTask;
-    };
-    
-    options.Events.OnRemoteFailure = context =>
-    {
-        Console.WriteLine("=== OnRemoteFailure ===");
-        Console.WriteLine($"Error: {context.Failure?.Message}");
-        Console.WriteLine($"Stack: {context.Failure?.StackTrace}");
-        context.Response.Redirect("/");
-        context.HandleResponse();
-        return Task.CompletedTask;
-    };
-});
+                Console.WriteLine($"=== GitHub OAuth - User: {userName} (ID: {gitHubId}) ===");
+            },
+            
+            OnRemoteFailure = context =>
+            {
+                Console.WriteLine("=== OnRemoteFailure ===");
+                Console.WriteLine($"Error: {context.Failure?.Message}");
+                context.Response.Redirect("/");
+                context.HandleResponse();
+                return Task.CompletedTask;
+            }
+        };
+    });
 
 
 var app = builder.Build();

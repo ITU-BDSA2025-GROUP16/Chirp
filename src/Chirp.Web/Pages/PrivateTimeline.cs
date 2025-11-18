@@ -27,7 +27,8 @@ public class PrivateTimelineModel : PageModel
     public void OnGet()
     {
 
-        Author = RouteData.Values["author"]?.ToString();
+        Author = User.Identity?.Name;
+
         int pageNumber = 1;
         string? pageQuery = HttpContext.Request.Query["page"];
         if (!string.IsNullOrEmpty(pageQuery) && int.TryParse(pageQuery, out int parsedPage))
@@ -50,16 +51,19 @@ public class PrivateTimelineModel : PageModel
     }
     public async Task<IActionResult> OnPostAsync()
     {
+        
         Console.WriteLine("=== OnPostAsync Called ===");
-        Author = RouteData.Values["author"]?.ToString();
+        Author = User.Identity?.Name;
+
 
         if (string.IsNullOrEmpty(Author))
         {
+            Console.WriteLine("Author null");
             return Page();
         }
 
         var currentUser = await _userManager.GetUserAsync(User);
-
+Console.WriteLine("User is:1" + currentUser);
         if (string.IsNullOrWhiteSpace(NewCheepText) || NewCheepText.Length > 160)
         {
             ModelState.AddModelError(string.Empty, "Cheep text must be between 1 and 160 characters.");
@@ -67,7 +71,7 @@ public class PrivateTimelineModel : PageModel
         }
 
         await _service.CreateCheep(currentUser, NewCheepText);
-
+        Console.WriteLine("User is:2" + currentUser);
         return Redirect("/");
     }
 }

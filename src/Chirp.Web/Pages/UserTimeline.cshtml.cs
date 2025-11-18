@@ -65,7 +65,7 @@ public class UserTimelineModel : PageModel
         }
 
         await _service.CreateCheep(currentUser, NewCheepText);
-
-        return Redirect("/");
+        Console.WriteLine("User:" + currentUser);
+        return Redirect("/my-timeline");
     }
 }

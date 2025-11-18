@@ -1,4 +1,4 @@
-﻿@page "/{author}"
+﻿@page "/user/{author}"
 @model Chirp.Web.Pages.UserTimelineModel
 @{
     ViewData["Title"] = "Chirp!";
@@ -6,7 +6,7 @@
 }
 
 <div>
-    <h2> @Model.Author's Timeline @Model.CurrentPage </h2>
+    <h2> @Model.Author's Timeline - Page @Model.CurrentPage </h2>
 
     @if (Model.Cheeps.Any())
     {

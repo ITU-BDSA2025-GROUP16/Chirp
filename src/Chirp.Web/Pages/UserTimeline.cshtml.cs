@@ -46,6 +46,7 @@ public class UserTimelineModel : PageModel
 
         Cheeps = _service.GetCheepsFromAuthor(Author, pageNumber);
     }
+    
     public async Task<IActionResult> OnPostAsync()
     {
         Console.WriteLine("=== OnPostAsync Called ===");
@@ -66,6 +67,6 @@ public class UserTimelineModel : PageModel
 
         await _service.CreateCheep(currentUser, NewCheepText);
         Console.WriteLine("User:" + currentUser);
-        return Redirect("/my-timeline");
+        return Redirect("/");
     }
 }

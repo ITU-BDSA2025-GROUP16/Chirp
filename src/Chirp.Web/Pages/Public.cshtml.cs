@@ -5,21 +5,28 @@ using Chirp.Core.Services;
 using Chirp.Core.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Chirp.Core.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace Chirp.Web.Pages;
 
 public class PublicModel : PageModel
 {
     private readonly ICheepService _service;
+    private readonly IFollowService _serviceA;
+
     private readonly UserManager<Author> _userManager;
+    private Author? _currentUser;
+    
     public string? Author { get; set; } = string.Empty;
     public List<CheepViewModel> Cheeps { get; set; } = new();
     public int CurrentPage { get; set; } = 1;
 
-    public PublicModel(ICheepService service, UserManager<Author> userManager)
+    public PublicModel(ICheepService service, IFollowService serviceA, UserManager<Author> userManager)
     {
         _service = service;
         _userManager = userManager;
+
+        _serviceA = serviceA;
     }
 
     public void OnGet()
@@ -34,8 +41,8 @@ public class PublicModel : PageModel
         CurrentPage = pageNumber;
         Cheeps = _service.GetCheeps(pageNumber);
     }
-    [IgnoreAntiforgeryToken]
     
+    [IgnoreAntiforgeryToken]
     public IActionResult OnPostGitHubLogin()
     {
         Console.WriteLine("=== GitHub Login Handler Called ===");
@@ -60,5 +67,43 @@ public class PublicModel : PageModel
             throw;
         }
     }
-}
 
+    //FOLLOW AND UNFOLLOW LOGIC:
+    [BindProperty]
+    public string? AuthorName { get; set; }
+
+   public async Task<IActionResult> OnPostFollowAsync()
+    {
+        Console.WriteLine("=== OnPostAsync Called ===");
+        
+        //My id:
+        var userIdString = _userManager.GetUserId(User);
+        Console.WriteLine("id is: " + userIdString);
+        if (string.IsNullOrEmpty(userIdString))
+        {
+            return Page();
+        }
+        int followerId = int.Parse(userIdString);
+
+
+
+        //Other id:
+       var authorToFollow = await _userManager.FindByNameAsync(AuthorName);
+       Console.WriteLine($"Looking for author with name: '{AuthorName}'");
+        if (authorToFollow == null)
+        {
+            Console.WriteLine("Author to follow was null");
+            return Page();
+        }
+        int followedId = authorToFollow.Id;
+
+
+
+        Console.WriteLine($"Follower ID: {followerId}, Following: {AuthorName} (ID: {followedId})");
+
+        //await _serviceA.Follow(followerId, followedId);
+        //Console.WriteLine("User:" + currentUser);
+        return Redirect("/");
+    }
+   
+}

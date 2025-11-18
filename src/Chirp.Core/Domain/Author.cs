@@ -29,6 +29,6 @@ public class Author : IdentityUser<int>
 
     // Navigation property
     public ICollection<Cheep> Cheeps { get; set; } = new List<Cheep>();
-
+     public ICollection<Author> Follows { get; set; } = new List<Author>();
 
 }

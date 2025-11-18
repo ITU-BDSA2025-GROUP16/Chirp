@@ -63,7 +63,6 @@ public class PrivateTimelineModel : PageModel
         }
 
         var currentUser = await _userManager.GetUserAsync(User);
-Console.WriteLine("User is:1" + currentUser);
         if (string.IsNullOrWhiteSpace(NewCheepText) || NewCheepText.Length > 160)
         {
             ModelState.AddModelError(string.Empty, "Cheep text must be between 1 and 160 characters.");
@@ -71,7 +70,6 @@ Console.WriteLine("User is:1" + currentUser);
         }
 
         await _service.CreateCheep(currentUser, NewCheepText);
-        Console.WriteLine("User is:2" + currentUser);
         return Redirect("/");
     }
 }

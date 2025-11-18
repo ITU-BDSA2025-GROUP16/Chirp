@@ -3,18 +3,23 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Authentication;
 using Chirp.Core.Services;
 using Chirp.Core.Interfaces;
+using Microsoft.AspNetCore.Identity;
+using Chirp.Core.Domain;
 
 namespace Chirp.Web.Pages;
 
 public class PublicModel : PageModel
 {
     private readonly ICheepService _service;
+    private readonly UserManager<Author> _userManager;
+    public string? Author { get; set; } = string.Empty;
     public List<CheepViewModel> Cheeps { get; set; } = new();
     public int CurrentPage { get; set; } = 1;
 
-    public PublicModel(ICheepService service)
+    public PublicModel(ICheepService service, UserManager<Author> userManager)
     {
         _service = service;
+        _userManager = userManager;
     }
 
     public void OnGet()
@@ -55,9 +60,5 @@ public class PublicModel : PageModel
             throw;
         }
     }
-    
-    
-    
-
 }
 

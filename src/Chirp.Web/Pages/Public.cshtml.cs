@@ -70,7 +70,7 @@ public class PublicModel : PageModel
 
     //FOLLOW AND UNFOLLOW LOGIC:
     [BindProperty]
-    public string? AuthorName { get; set; }
+    public int FollowedId { get; set; }
 
    public async Task<IActionResult> OnPostFollowAsync()
     {
@@ -88,21 +88,20 @@ public class PublicModel : PageModel
 
 
         //Other id:
-       var authorToFollow = await _userManager.FindByNameAsync(AuthorName);
+       /*var authorToFollow = await _userManager.FindByNameAsync(AuthorName);
        Console.WriteLine($"Looking for author with name: '{AuthorName}'");
         if (authorToFollow == null)
         {
             Console.WriteLine("Author to follow was null");
             return Page();
         }
-        int followedId = authorToFollow.Id;
+        int followedId = authorToFollow.Id;*/
 
 
 
-        Console.WriteLine($"Follower ID: {followerId}, Following: {AuthorName} (ID: {followedId})");
+        Console.WriteLine($"Follower ID: {followerId} AND ID: {FollowedId})");
 
-        //await _serviceA.Follow(followerId, followedId);
-        //Console.WriteLine("User:" + currentUser);
+        await _serviceA.Follow(followerId, FollowedId);
         return Redirect("/");
     }
    

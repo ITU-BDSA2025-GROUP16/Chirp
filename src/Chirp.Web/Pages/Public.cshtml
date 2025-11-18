@@ -21,8 +21,8 @@
 
         @if (User.Identity?.Name != cheep.Author)
         {
-            <form method="post" asp-page-handler="Follow" style="margin:0;">
-    <input type="hidden" name="authorName" value="@cheep.Author" />
+           <form method="post" asp-page-handler="Follow" style="margin:0;">
+    <input type="hidden" name="followedId" value="@cheep.AuthorId" />
     <button type="submit">Follow/Unfollow</button>
 </form>
         }

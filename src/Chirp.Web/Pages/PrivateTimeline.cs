@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Chirp.Core.Services;
 using Chirp.Core.Interfaces;
@@ -7,8 +7,10 @@ using Chirp.Core.Domain;
 
 namespace Chirp.Web.Pages;
 
-public class UserTimelineModel : PageModel
+public class PrivateTimelineModel : PageModel
 {
+
+    
     private readonly ICheepService _service;
     private readonly UserManager<Author> _userManager;
     public List<CheepViewModel> Cheeps { get; set; } = new();
@@ -16,7 +18,7 @@ public class UserTimelineModel : PageModel
     public string? Author { get; set; } = string.Empty;
     [BindProperty]
     public string NewCheepText { get; set; } = string.Empty;
-    public UserTimelineModel(ICheepService service, UserManager<Author> userManager)
+    public PrivateTimelineModel(ICheepService service, UserManager<Author> userManager)
     {
         _service = service;
         _userManager = userManager;

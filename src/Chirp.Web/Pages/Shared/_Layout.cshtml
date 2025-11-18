@@ -28,7 +28,7 @@
         @if (User.Identity.IsAuthenticated)
         {
             <div>
-                <a href="/@(displayName)">my timeline</a> |
+                <a href="/@("my-timeline")">my timeline</a> |
                 <a href="/">public timeline</a> |
                 <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Logout">Logout [@displayName]</a>
             </div>

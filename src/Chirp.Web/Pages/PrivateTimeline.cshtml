@@ -1,4 +1,4 @@
-@page "/my-timeline"
+@page "/private/{author}"
 @model Chirp.Web.Pages.PrivateTimelineModel
 @{
     ViewData["Title"] = "Chirp!";
@@ -25,10 +25,23 @@
                 @foreach (var cheep in Model.Cheeps)
                 {
                     <li>
-                        <p>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
                             <strong>
-                                <a href="/@cheep.Author">@cheep.Author</a>
+                                <a href="/user/@cheep.Author">@cheep.Author</a>
                             </strong>
+
+                            @if (User.Identity?.Name != cheep.Author)
+                            {
+                                <form method="post" asp-page-handler="Follow" style="margin:0;">
+                                    <input type="hidden" name="followedId" value="@cheep.AuthorId" />
+                                    <button type="submit" style="width: 90px;">
+                                        @(Model.FollowedAuthorIds.Contains(cheep.AuthorId) ? "Unfollow" : "Follow")
+                                    </button>
+                                </form>
+                            }
+                        </div>
+
+                        <p>
                             @cheep.Message
                             <small>&mdash; @cheep.Timestamp</small>
                         </p>
@@ -46,5 +59,5 @@ else
 {
     <p>You are not logged in.</p>
     <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
-                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+    <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
 }

@@ -45,4 +45,12 @@ public class FollowRepository : IFollowRepository
         return await _context.Follows
             .AnyAsync(f => f.FollowerId == followerId && f.FollowedId == followedId);
     }
+
+    public async Task<HashSet<int>> GetFollowedIds(int followerId)
+{
+    return await _context.Follows
+        .Where(f => f.FollowerId == followerId)
+        .Select(f => f.FollowedId)
+        .ToHashSetAsync();
+}
 } 

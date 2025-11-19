@@ -10,21 +10,30 @@ namespace Chirp.Web.Pages;
 public class UserTimelineModel : PageModel
 {
     private readonly ICheepService _service;
+    private readonly IFollowService _followService;
     private readonly UserManager<Author> _userManager;
+    
     public List<CheepViewModel> Cheeps { get; set; } = new();
     public int CurrentPage { get; set; } = 1;
     public string? Author { get; set; } = string.Empty;
+    public int? AuthorId { get; set; }
+    public bool IsFollowing { get; set; } = false;
+    
     [BindProperty]
     public string NewCheepText { get; set; } = string.Empty;
-    public UserTimelineModel(ICheepService service, UserManager<Author> userManager)
+    
+    [BindProperty]
+    public int FollowedId { get; set; }
+
+    public UserTimelineModel(ICheepService service, IFollowService followService, UserManager<Author> userManager)
     {
         _service = service;
+        _followService = followService;
         _userManager = userManager;
     }
 
-    public void OnGet()
+    public async Task OnGetAsync()
     {
-
         Author = RouteData.Values["author"]?.ToString();
         int pageNumber = 1;
         string? pageQuery = HttpContext.Request.Query["page"];
@@ -33,10 +42,7 @@ public class UserTimelineModel : PageModel
             pageNumber = parsedPage > 0 ? parsedPage : 1;
         }
 
-
         CurrentPage = pageNumber;
-
-        Console.WriteLine(pageNumber);
 
         if (string.IsNullOrEmpty(Author))
         {
@@ -45,6 +51,21 @@ public class UserTimelineModel : PageModel
         }
 
         Cheeps = _service.GetCheepsFromAuthor(Author, pageNumber);
+        
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            var userIdString = _userManager.GetUserId(User);
+            if (!string.IsNullOrEmpty(userIdString))
+            {
+                int currentUserId = int.Parse(userIdString);
+                
+                if (Cheeps.Any())
+                {
+                    AuthorId = Cheeps.First().AuthorId;
+                    IsFollowing = await _followService.IsFollowing(currentUserId, AuthorId.Value);
+                }
+            }
+        }
     }
     
     public async Task<IActionResult> OnPostAsync()
@@ -68,5 +89,37 @@ public class UserTimelineModel : PageModel
         await _service.CreateCheep(currentUser, NewCheepText);
         Console.WriteLine("User:" + currentUser);
         return Redirect("/");
+    }
+    
+    public async Task<IActionResult> OnPostFollowAsync()
+    {
+        Console.WriteLine("=== OnPostFollowAsync Called ===");
+        
+        Author = RouteData.Values["author"]?.ToString();
+        
+        var userIdString = _userManager.GetUserId(User);
+        if (string.IsNullOrEmpty(userIdString))
+        {
+            return Page();
+        }
+        
+        int followerId = int.Parse(userIdString);
+
+        Console.WriteLine($"Follower ID: {followerId}, Target ID: {FollowedId}");
+
+        bool isFollowing = await _followService.IsFollowing(followerId, FollowedId);
+        
+        if (isFollowing)
+        {
+            await _followService.Unfollow(followerId, FollowedId);
+            Console.WriteLine("Unfollowed!");
+        }
+        else
+        {
+            await _followService.Follow(followerId, FollowedId);
+            Console.WriteLine("Followed!");
+        }
+        
+        return Redirect($"/user/{Author}");
     }
 }

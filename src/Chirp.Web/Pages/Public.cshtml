@@ -19,12 +19,14 @@
             <a href="/user/@cheep.Author">@cheep.Author</a>
         </strong>
 
-        @if (User.Identity?.Name != cheep.Author)
+        @if (User.Identity?.IsAuthenticated == true && User.Identity?.Name != cheep.Author)
         {
            <form method="post" asp-page-handler="Follow" style="margin:0;">
-    <input type="hidden" name="followedId" value="@cheep.AuthorId" />
-    <button type="submit">Follow/Unfollow</button>
-</form>
+                <input type="hidden" name="followedId" value="@cheep.AuthorId" />
+                <button type="submit" style="width: 90px;">
+                    @(Model.FollowedAuthorIds.Contains(cheep.AuthorId) ? "Unfollow" : "Follow")
+                </button>
+            </form>
         }
     </div>
 

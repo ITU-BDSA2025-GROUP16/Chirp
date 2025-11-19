@@ -6,7 +6,19 @@
 }
 
 <div>
-    <h2> @Model.Author's Timeline - Page @Model.CurrentPage </h2>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2>@Model.Author's Timeline - Page @Model.CurrentPage</h2>
+        
+        @if (User.Identity?.IsAuthenticated == true && User.Identity?.Name != Model.Author && Model.AuthorId.HasValue)
+        {
+            <form method="post" asp-page-handler="Follow" style="margin:0;">
+                <input type="hidden" name="followedId" value="@Model.AuthorId" />
+                <button type="submit" style="width: 90px;">
+                    @(Model.IsFollowing ? "Unfollow" : "Follow")
+                </button>
+            </form>
+        }
+    </div>
 
     @if (Model.Cheeps.Any())
     {
@@ -16,7 +28,7 @@
                 <li>
                     <p>
                         <strong>
-                            <a href="/@cheep.Author">@cheep.Author</a>
+                            <a href="/user/@cheep.Author">@cheep.Author</a>
                         </strong>
                         @cheep.Message
                         <small>&mdash; @cheep.Timestamp</small>

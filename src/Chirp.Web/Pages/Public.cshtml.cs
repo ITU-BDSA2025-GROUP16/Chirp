@@ -21,6 +21,11 @@ public class PublicModel : PageModel
     public List<CheepViewModel> Cheeps { get; set; } = new();
     public int CurrentPage { get; set; } = 1;
 
+    public HashSet<int> FollowedAuthorIds { get; set; } = new();
+    
+    [BindProperty]
+    public int FollowedId { get; set; }
+    
     public PublicModel(ICheepService service, IFollowService serviceA, UserManager<Author> userManager)
     {
         _service = service;
@@ -29,8 +34,7 @@ public class PublicModel : PageModel
         _serviceA = serviceA;
     }
 
-    public void OnGet()
-    {
+    public async Task OnGetAsync() {
         int pageNumber = 1;
         string? pageQuery = HttpContext.Request.Query["page"];
         if (!string.IsNullOrEmpty(pageQuery) && int.TryParse(pageQuery, out int parsedPage))
@@ -40,6 +44,16 @@ public class PublicModel : PageModel
 
         CurrentPage = pageNumber;
         Cheeps = _service.GetCheeps(pageNumber);
+    
+        if (User.Identity?.IsAuthenticated ?? false)
+        {
+            var userIdString = _userManager.GetUserId(User);
+            if (!string.IsNullOrEmpty(userIdString))
+            {
+                int userId = int.Parse(userIdString);
+                FollowedAuthorIds = await _serviceA.GetFollowedIds(userId);
+            }
+        }
     }
     
     [IgnoreAntiforgeryToken]
@@ -69,8 +83,6 @@ public class PublicModel : PageModel
     }
 
     //FOLLOW AND UNFOLLOW LOGIC:
-    [BindProperty]
-    public int FollowedId { get; set; }
 
    public async Task<IActionResult> OnPostFollowAsync()
     {

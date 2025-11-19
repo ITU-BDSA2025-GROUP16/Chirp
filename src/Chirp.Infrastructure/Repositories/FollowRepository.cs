@@ -16,17 +16,33 @@ public class FollowRepository : IFollowRepository
         _context = context;
     }
 
-     public async Task Follow(int follower, int followed)
+    public async Task Follow(int followerId, int followedId)
     {
-        
-        var follow = new Follow
-        {
-        FollowerId = follower,
-        FollowedId = followed
+        var follow = new Follow 
+        { 
+            FollowerId = followerId, 
+            FollowedId = followedId 
         };
-
+        
         _context.Follows.Add(follow);
-    await _context.SaveChangesAsync(); 
+        await _context.SaveChangesAsync();
     }
 
-}   
+    public async Task Unfollow(int followerId, int followedId)
+    {
+        var follow = await _context.Follows
+            .FirstOrDefaultAsync(f => f.FollowerId == followerId && f.FollowedId == followedId);
+        
+        if (follow != null)
+        {
+            _context.Follows.Remove(follow);
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task<bool> IsFollowing(int followerId, int followedId)
+    {
+        return await _context.Follows
+            .AnyAsync(f => f.FollowerId == followerId && f.FollowedId == followedId);
+    }
+} 

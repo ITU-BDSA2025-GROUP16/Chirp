@@ -29,7 +29,8 @@ public class CheepRepository : ICheepRepository
             .Select(c => new CheepViewModel(
                 c.Author.Name,
                 c.Text,
-                c.TimeStamp.ToString("MM/dd/yy H:mm:ss")
+                c.TimeStamp.ToString("MM/dd/yy H:mm:ss"),
+                c.Author.Id
             ))
             .ToList();
     }
@@ -47,7 +48,8 @@ public class CheepRepository : ICheepRepository
             .Select(c => new CheepViewModel(
                 c.Author.Name,
                 c.Text,
-                c.TimeStamp.ToString("MM/dd/yy H:mm:ss")
+                c.TimeStamp.ToString("MM/dd/yy H:mm:ss"),
+                c.Author.Id
             ))
             .ToList();
     }

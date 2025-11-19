@@ -84,24 +84,26 @@ public class PublicModel : PageModel
             return Page();
         }
         int followerId = int.Parse(userIdString);
-
-
-
-        //Other id:
-       /*var authorToFollow = await _userManager.FindByNameAsync(AuthorName);
-       Console.WriteLine($"Looking for author with name: '{AuthorName}'");
-        if (authorToFollow == null)
-        {
-            Console.WriteLine("Author to follow was null");
-            return Page();
-        }
-        int followedId = authorToFollow.Id;*/
-
-
-
+        //Their id automatic through repo
         Console.WriteLine($"Follower ID: {followerId} AND ID: {FollowedId})");
 
-        await _serviceA.Follow(followerId, FollowedId);
+        bool isFollowing = await _serviceA.IsFollowing(followerId, FollowedId);
+    
+
+        if (isFollowing)
+        {
+            //Unfollow
+            await _serviceA.Unfollow(followerId, FollowedId);
+            Console.WriteLine("Unfollowed!");
+        }
+        else
+        {
+            //Follow
+            await _serviceA.Follow(followerId, FollowedId);
+            Console.WriteLine("Followed!");
+        }
+
+
         return Redirect("/");
     }
    

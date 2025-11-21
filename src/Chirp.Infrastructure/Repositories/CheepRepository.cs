@@ -29,7 +29,8 @@ public class CheepRepository : ICheepRepository
             .Select(c => new CheepViewModel(
                 c.Author.Name,
                 c.Text,
-                c.TimeStamp.ToString("MM/dd/yy H:mm:ss")
+                c.TimeStamp.ToString("MM/dd/yy H:mm:ss"),
+                c.Author.Id
             ))
             .ToList();
     }
@@ -47,10 +48,34 @@ public class CheepRepository : ICheepRepository
             .Select(c => new CheepViewModel(
                 c.Author.Name,
                 c.Text,
-                c.TimeStamp.ToString("MM/dd/yy H:mm:ss")
+                c.TimeStamp.ToString("MM/dd/yy H:mm:ss"),
+                c.Author.Id
             ))
             .ToList();
     }
+
+    public List<CheepViewModel> GetCheepsFromFollowedAuthors(List<int> authorIds, int pageNumber = 1)
+{
+    const int pageSize = 32;
+    
+    if (!authorIds.Any())
+    {
+        return new List<CheepViewModel>();
+    }
+    
+    return _context.Cheeps
+        .Where(c => authorIds.Contains(c.AuthorId))
+        .OrderByDescending(c => c.TimeStamp)
+        .Skip((pageNumber - 1) * pageSize)
+        .Take(pageSize)
+        .Select(c => new CheepViewModel(
+            c.Author.Name,
+            c.Text,
+            c.TimeStamp.ToString("MM/dd/yy H:mm:ss"),
+            c.Author.Id
+        ))
+        .ToList();
+}
 
    public async Task CreateCheep(string cheepText, Author author)
     {

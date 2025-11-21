@@ -11,4 +11,4 @@ public interface IAuthorRepository
   public Author? GetAuthorFromName(string name);
 
   public Author? GetAuthorFromEmail(string email);
-}
+    }

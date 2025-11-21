@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Chirp.Core.Services;
 using Chirp.Core.Interfaces;
@@ -7,34 +7,35 @@ using Chirp.Core.Domain;
 
 namespace Chirp.Web.Pages;
 
-public class UserTimelineModel : PageModel
+public class PrivateTimelineModel : PageModel
 {
     private readonly ICheepService _service;
-    private readonly IFollowService _followService;
+    private readonly IFollowService _followService; 
     private readonly UserManager<Author> _userManager;
     
     public List<CheepViewModel> Cheeps { get; set; } = new();
     public int CurrentPage { get; set; } = 1;
     public string? Author { get; set; } = string.Empty;
-    public int? AuthorId { get; set; }
-    public bool IsFollowing { get; set; } = false;
+
+    public HashSet<int> FollowedAuthorIds { get; set; } = new();
     
     [BindProperty]
     public string NewCheepText { get; set; } = string.Empty;
     
     [BindProperty]
-    public int FollowedId { get; set; }
+    public int FollowedId { get; set; } 
 
-    public UserTimelineModel(ICheepService service, IFollowService followService, UserManager<Author> userManager)
+    public PrivateTimelineModel(ICheepService service, IFollowService followService, UserManager<Author> userManager) 
     {
         _service = service;
-        _followService = followService;
+        _followService = followService; 
         _userManager = userManager;
     }
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync() 
     {
-        Author = RouteData.Values["author"]?.ToString();
+        Author = User.Identity?.Name;
+
         int pageNumber = 1;
         string? pageQuery = HttpContext.Request.Query["page"];
         if (!string.IsNullOrEmpty(pageQuery) && int.TryParse(pageQuery, out int parsedPage))
@@ -50,36 +51,32 @@ public class UserTimelineModel : PageModel
             return;
         }
 
-        Cheeps = _service.GetCheepsFromAuthor(Author, pageNumber);
-        
-        if (User.Identity?.IsAuthenticated == true)
+        var userIdString = _userManager.GetUserId(User);
+        if (string.IsNullOrEmpty(userIdString))
         {
-            var userIdString = _userManager.GetUserId(User);
-            if (!string.IsNullOrEmpty(userIdString))
-            {
-                int currentUserId = int.Parse(userIdString);
-                
-                if (Cheeps.Any())
-                {
-                    AuthorId = Cheeps.First().AuthorId;
-                    IsFollowing = await _followService.IsFollowing(currentUserId, AuthorId.Value);
-                }
-            }
+            Cheeps = new();
+            return;
         }
+
+        int userId = int.Parse(userIdString);
+        
+        FollowedAuthorIds = await _followService.GetFollowedIds(userId);
+        var authorIdsToShow = new List<int>(FollowedAuthorIds) { userId };
+        Cheeps = _service.GetCheepsFromFollowedAuthors(authorIdsToShow.ToList(), pageNumber);
     }
     
     public async Task<IActionResult> OnPostAsync()
     {
         Console.WriteLine("=== OnPostAsync Called ===");
-        Author = RouteData.Values["author"]?.ToString();
+        Author = User.Identity?.Name;
 
         if (string.IsNullOrEmpty(Author))
         {
+            Console.WriteLine("Author null");
             return Page();
         }
 
         var currentUser = await _userManager.GetUserAsync(User);
-
         if (string.IsNullOrWhiteSpace(NewCheepText) || NewCheepText.Length > 160)
         {
             ModelState.AddModelError(string.Empty, "Cheep text must be between 1 and 160 characters.");
@@ -87,15 +84,13 @@ public class UserTimelineModel : PageModel
         }
 
         await _service.CreateCheep(currentUser, NewCheepText);
-        Console.WriteLine("User:" + currentUser);
-        return Redirect("/");
+        return Redirect("/private/{author}");
     }
-    
+
+
     public async Task<IActionResult> OnPostFollowAsync()
     {
         Console.WriteLine("=== OnPostFollowAsync Called ===");
-        
-        Author = RouteData.Values["author"]?.ToString();
         
         var userIdString = _userManager.GetUserId(User);
         if (string.IsNullOrEmpty(userIdString))
@@ -120,6 +115,6 @@ public class UserTimelineModel : PageModel
             Console.WriteLine("Followed!");
         }
         
-        return Redirect($"/user/{Author}");
+        return Redirect("/private/{author}");
     }
 }

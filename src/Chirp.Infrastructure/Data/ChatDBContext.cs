@@ -14,6 +14,7 @@ public class ChatDBContext : IdentityDbContext<Author, IdentityRole<int>, int>
 
     public DbSet<Cheep> Cheeps { get; set; } = null!;
     public DbSet<Author> Authors { get; set; } = null!;
+    public DbSet<Follow> Follows { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -27,5 +28,15 @@ public class ChatDBContext : IdentityDbContext<Author, IdentityRole<int>, int>
              .HasForeignKey(c => c.AuthorId)
              .OnDelete(DeleteBehavior.Cascade);
         });
+
+        builder.Entity<Follow>(b =>
+        {
+            b.HasKey(f => new { f.FollowerId, f.FollowedId });
+            
+            b.HasIndex(f => f.FollowerId);
+            b.HasIndex(f => f.FollowedId);
+        });
+
+        
     }
 }

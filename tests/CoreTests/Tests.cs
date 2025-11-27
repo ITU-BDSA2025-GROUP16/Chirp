@@ -302,6 +302,31 @@ public class Tests
 	}
 
 	
-	
+	[Fact]
+	public void AuthorCanFollowMultipleUsers()
+	{
+		var options = new DbContextOptionsBuilder<ChatDBContext>()
+			.UseInMemoryDatabase("FollowTestDb3")
+			.Options;
+
+		using var context = new ChatDBContext(options);
+
+		var alice = new Author { Id = 1, Name = "Alice", Email = "alice@test.com" };
+		var bob = new Author { Id = 2, Name = "Bob", Email = "bob@test.com" };
+		var charlie = new Author { Id = 3, Name = "Charlie", Email = "charlie@test.com" };
+
+		context.Authors.AddRange(alice, bob, charlie);
+		context.SaveChanges();
+
+		context.Follows.Add(new Follow { FollowerId = alice.Id, FollowedId = bob.Id });
+		context.Follows.Add(new Follow { FollowerId = alice.Id, FollowedId = charlie.Id });
+		context.SaveChanges();
+
+		var follows = context.Follows.Where(f => f.FollowerId == alice.Id).ToList();
+		Assert.Equal(2, follows.Count);
+		Assert.Contains(follows, f => f.FollowedId == bob.Id);
+		Assert.Contains(follows, f => f.FollowedId == charlie.Id);
+	}
+
 
 }

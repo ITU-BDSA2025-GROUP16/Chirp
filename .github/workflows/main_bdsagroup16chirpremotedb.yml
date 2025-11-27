@@ -24,11 +24,10 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: dotnet build src/Chirp.Web/Chirp.Web.csproj --configuration Release
+        run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish src/Chirp.Web/Chirp.Web.csproj -c Release -o ${{ env.DOTNET_ROOT }}/myapp
-
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -52,9 +51,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_43B6DBDF46F5488CA84F65050C96959F }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_3EB2463E304A4900A5D7B1A49753FC29 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_87638D9D0D6D4320A4BA2AB096CF66B8 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_4E26ABC6A1AB44179154191AE0F3A6FC }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_224BFD7F63924198B4F9F9BCC644050C }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C920E53720A1427EA16FED6283D4A9E7 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -63,5 +62,4 @@ jobs:
           app-name: 'bdsagroup16chirpremotedb'
           slot-name: 'Production'
           package: .
-
           

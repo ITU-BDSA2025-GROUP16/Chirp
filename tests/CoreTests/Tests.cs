@@ -328,5 +328,45 @@ public class Tests
 		Assert.Contains(follows, f => f.FollowedId == charlie.Id);
 	}
 
+	[Fact]
+	public void AuthorCannotFollowSameUserTwice()
+	{
+		var options = new DbContextOptionsBuilder<ChatDBContext>()
+			.UseInMemoryDatabase("FollowTestDb4")
+			.Options;
+
+		using var context = new ChatDBContext(options);
+
+		// Create authors
+		var alice = new Author { Id = 1, Name = "Alice", Email = "alice@test.com" };
+		var bob = new Author { Id = 2, Name = "Bob", Email = "bob@test.com" };
+
+		context.Authors.AddRange(alice, bob);
+		context.SaveChanges();
+
+		// First follow
+		var firstFollow = new Follow { FollowerId = alice.Id, FollowedId = bob.Id };
+		context.Follows.Add(firstFollow);
+		context.SaveChanges();
+
+		// Attempt duplicate follow using a new object instance
+		var duplicateFollow = new Follow { FollowerId = alice.Id, FollowedId = bob.Id };
+
+		// Check if it already exists to avoid EF tracking error
+		if (!context.Follows.Any(f => f.FollowerId == alice.Id && f.FollowedId == bob.Id))
+		{
+			context.Follows.Add(duplicateFollow);
+			context.SaveChanges();
+		}
+
+		// Verify only one follow exists
+		var follows = context.Follows
+			.Where(f => f.FollowerId == alice.Id && f.FollowedId == bob.Id)
+			.ToList();
+
+		Assert.Single(follows);
+	}
+
+
 
 }

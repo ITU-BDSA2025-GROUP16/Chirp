@@ -279,5 +279,29 @@ public class Tests
 		var follow = context.Follows.FirstOrDefault(f => f.FollowerId == alice.Id && f.FollowedId == bob.Id);
 		Assert.NotNull(follow);
 	}
+	
+	[Fact]
+	public void AuthorCannotFollowThemselves()
+	{
+		var options = new DbContextOptionsBuilder<ChatDBContext>()
+			.UseInMemoryDatabase("FollowTestDb2")
+			.Options;
+
+		using var context = new ChatDBContext(options);
+
+		var alice = new Author { Id = 1, Name = "Alice", Email = "alice@test.com" };
+		context.Authors.Add(alice);
+		context.SaveChanges();
+
+		context.Follows.Add(new Follow { FollowerId = alice.Id, FollowedId = alice.Id });
+
+		context.SaveChanges();
+
+		var follow = context.Follows.FirstOrDefault(f => f.FollowerId == alice.Id && f.FollowedId == alice.Id);
+		Assert.NotNull(follow); 
+	}
+
+	
+	
 
 }

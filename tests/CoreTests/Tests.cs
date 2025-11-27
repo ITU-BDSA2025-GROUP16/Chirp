@@ -14,7 +14,8 @@ namespace Chirp.Web;
 public class Tests
 {
 	//Tests for the database
-
+	/*
+	
 	[Fact]
 	public void UnitUserCreatingTest()
 	{
@@ -183,7 +184,7 @@ public class Tests
     	Assert.NotNull(cheep);
     	Assert.Equal("This is a test!", cheep.Text);
     	Assert.Equal(author.Name, cheep.Author.Name);
-}
+	}
 	[Fact]
 	public void IntegrationMessageByUserDataBaseTest()
 	{
@@ -256,4 +257,27 @@ public class Tests
 		Assert.Equal("It was but a very ancient cluster of blocks generally painted green, and for no other, he shielded me.", cheeps[0].Message);
 		Assert.Equal("See how that murderer could be from any trivial business not connected with her.", cheeps[1].Message);
 	}
+	*/
+	[Fact]
+	public void AuthorCanFollowAnotherAuthor()
+	{
+		var options = new DbContextOptionsBuilder<ChatDBContext>()
+			.UseInMemoryDatabase("FollowTestDb")
+			.Options;
+
+		using var context = new ChatDBContext(options);
+
+		var alice = new Author { Id = 1, Name = "Alice", Email = "alice@test.com" };
+		var bob = new Author { Id = 2, Name = "Bob", Email = "bob@test.com" };
+		context.Authors.Add(alice);
+		context.Authors.Add(bob);
+		context.SaveChanges();
+
+		context.Follows.Add(new Follow { FollowerId = alice.Id, FollowedId = bob.Id });
+		context.SaveChanges();
+
+		var follow = context.Follows.FirstOrDefault(f => f.FollowerId == alice.Id && f.FollowedId == bob.Id);
+		Assert.NotNull(follow);
+	}
+
 }

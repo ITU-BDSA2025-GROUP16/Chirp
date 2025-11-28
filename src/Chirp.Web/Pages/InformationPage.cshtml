@@ -9,7 +9,6 @@
 {
     <div>
         <h2>About @User.Identity.Name</h2>
-        <p>Here is the information we have stored about you:</p>
 
         <section>
             <h3>User Details</h3>
@@ -22,7 +21,21 @@
 
         <section>
             <h3>People You Follow</h3>
-            <!-- Add following list here -->
+           @if (Model.FollowedAuthors.Any())
+    {
+        <ul>
+            @foreach (var author in Model.FollowedAuthors)
+            {
+                <li>
+                    <a href="/user/@author.Name">@author.Name</a>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <em>You are not following anyone yet.</em>
+    }
         </section>
 
         <section>

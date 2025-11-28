@@ -30,4 +30,9 @@ public class AuthorRepository : IAuthorRepository
                    .FirstOrDefault(a => a.Email == email);
     }
 
+    public Author? GetAuthorFromId(int id)
+    {
+        return _context.Authors
+                   .FirstOrDefault(a => a.Id == id);
+    }
 }   

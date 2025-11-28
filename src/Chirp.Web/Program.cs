@@ -24,10 +24,11 @@ builder.Services.AddDbContext<ChatDBContext>(
 builder.Services.AddDefaultIdentity<Author>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<ChatDBContext>();
 
 // Register services
+builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
 builder.Services.AddScoped<ICheepService, CheepService>();
 builder.Services.AddScoped<ICheepRepository, CheepRepository>();
-builder.Services.AddScoped<IFollowService, FollowService>();      // Add this
-builder.Services.AddScoped<IFollowRepository, FollowRepository>(); // Add this
+builder.Services.AddScoped<IFollowService, FollowService>();    
+builder.Services.AddScoped<IFollowRepository, FollowRepository>(); 
 
 builder.Services.AddRazorPages();
 

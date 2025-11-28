@@ -55,6 +55,39 @@ public class CheepBoxVisibilityTests : IClassFixture<CustomWebApplicationFactory
         // Assert
         Assert.Contains("cheepbox", content);
     }
+    [Fact]
+    public async Task PrivateTimeline_AuthenticatedUser_ShowCheepBoxForms()
+    {
+        // Arrange
+        var authenticatedClient = _factory.CreateAuthenticatedClient("TestUser");
+    
+        // Act
+        var response = await authenticatedClient.GetAsync("/private/TestUser");
+        var content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        
+        Assert.Contains("What's on your mind", content);
+        Assert.Contains("type=\"text\"", content);
+        Assert.Contains("type=\"submit\"", content);
+        Assert.Contains("value=\"Share\"", content);
+    }
+    [Fact]
+    public async Task PublicTimeline_AuthenticatedUser_NoCheepBox()
+    {
+        // Arrange
+        var authenticatedClient = _factory.CreateAuthenticatedClient("TestUser");
+    
+        // Act
+        var response = await authenticatedClient.GetAsync("/");
+        var content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        
+        Assert.DoesNotContain("cheepbox", content);
+        
+        
+    }
 
 
 }

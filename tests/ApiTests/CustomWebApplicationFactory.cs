@@ -8,6 +8,7 @@ using Chirp.Core.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using MyChat.Razor.Tests;
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Logging;
 
 namespace Chirp.Web;
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
@@ -16,6 +17,12 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     private SqliteConnection? _connection;
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        // Suppress noisy EF Core database logs
+        builder.ConfigureLogging(logging =>
+        {
+            logging.ClearProviders();
+            logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.None);
+        });
         builder.ConfigureServices(services =>
         {
             var dbContextDescriptor = services.SingleOrDefault(

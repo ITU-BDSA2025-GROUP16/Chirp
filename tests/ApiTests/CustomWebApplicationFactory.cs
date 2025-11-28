@@ -4,14 +4,25 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Chirp.Infrastructure.Data;
 using Chirp.Infrastructure.Repositories;
-using Chirp.Core.Interfaces; 
+using Chirp.Core.Interfaces;
+using Microsoft.AspNetCore.Authentication;
+using MyChat.Razor.Tests;
+using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Logging;
 
 namespace Chirp.Web;
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
     //In memory instance of our website.
+    private SqliteConnection? _connection;
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        // Suppress noisy EF Core database logs
+        builder.ConfigureLogging(logging =>
+        {
+            logging.ClearProviders();
+            logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.None);
+        });
         builder.ConfigureServices(services =>
         {
             var dbContextDescriptor = services.SingleOrDefault(
@@ -29,21 +40,39 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             if (facadeDescriptor != null)
                 services.Remove(facadeDescriptor);
 
+            // Create and keep the connection alive for the lifetime of the factory
+            _connection = new SqliteConnection("Data Source=:memory:");
+            _connection.Open();
+
             services.AddDbContext<ChatDBContext>(options =>
             {
-                options.UseSqlite("Data Source=:memory:");
+                options.UseSqlite(_connection);
             });
+
+            // uses TestAuthHandler to check if users are logged in during tests
+            services.AddAuthentication(TestAuthHandler.AuthenticationScheme)
+                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+                    TestAuthHandler.AuthenticationScheme, options => { });
 
             var sp = services.BuildServiceProvider();
             using (var scope = sp.CreateScope())
             {
                 var scopedServices = scope.ServiceProvider;
                 var db = scopedServices.GetRequiredService<ChatDBContext>();
-                
-                db.Database.OpenConnection(); 
+
                 db.Database.EnsureCreated();
-                
+
             }
         });
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        if (disposing)
+        {
+            _connection?.Close();
+            _connection?.Dispose();
+        }
     }
 }

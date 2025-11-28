@@ -25,6 +25,12 @@ public class PublicModel : PageModel
     
     [BindProperty]
     public int FollowedId { get; set; }
+
+    [BindProperty]
+    public int AuthorId { get; set; }
+
+    [BindProperty]
+    public string Timestamp { get; set; }
     
     public PublicModel(ICheepService service, IFollowService serviceA, UserManager<Author> userManager)
     {
@@ -118,5 +124,12 @@ public class PublicModel : PageModel
 
         return Redirect("/");
     }
-   
+    public IActionResult OnPostLike()
+    {
+        if (!User.Identity.IsAuthenticated)
+            return Forbid();
+
+        Console.WriteLine($"User {User.Identity.Name} liked cheep by {AuthorId} at {Timestamp}");
+        return RedirectToPage("/public");
+    }
 }

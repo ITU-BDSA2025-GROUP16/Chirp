@@ -26,6 +26,7 @@ public class UserTimelineModel : PageModel
     
     [BindProperty]
     public int FollowedId { get; set; }
+    
 
     public UserTimelineModel(ICheepService service, IFollowService followService, UserManager<Author> userManager)
     {
@@ -150,4 +151,7 @@ public class UserTimelineModel : PageModel
 
         return RedirectToPage("/Public");
     }
+
+
+
 }

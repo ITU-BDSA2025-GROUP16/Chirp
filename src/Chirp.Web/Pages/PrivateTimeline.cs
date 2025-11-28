@@ -65,7 +65,7 @@ public class PrivateTimelineModel : PageModel
         Cheeps = _service.GetCheepsFromFollowedAuthors(authorIdsToShow.ToList(), pageNumber);
     }
     
-    public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync()
     {
         Console.WriteLine("=== OnPostAsync Called ===");
         Author = User.Identity?.Name;

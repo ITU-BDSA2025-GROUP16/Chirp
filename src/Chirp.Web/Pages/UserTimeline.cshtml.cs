@@ -4,6 +4,8 @@ using Chirp.Core.Services;
 using Chirp.Core.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Chirp.Core.Domain;
+using Microsoft.AspNetCore.Authentication;
+
 
 namespace Chirp.Web.Pages;
 
@@ -24,6 +26,7 @@ public class UserTimelineModel : PageModel
     
     [BindProperty]
     public int FollowedId { get; set; }
+    
 
     public UserTimelineModel(ICheepService service, IFollowService followService, UserManager<Author> userManager)
     {

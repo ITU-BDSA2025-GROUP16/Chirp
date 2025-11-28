@@ -55,7 +55,7 @@ public class CheepRepository : ICheepRepository
     }
 
     public List<CheepViewModel> GetCheepsFromFollowedAuthors(List<int> authorIds, int pageNumber = 1)
-{
+    {
     const int pageSize = 32;
     
     if (!authorIds.Any())
@@ -75,7 +75,7 @@ public class CheepRepository : ICheepRepository
             c.Author.Id
         ))
         .ToList();
-}
+    }
 
    public async Task CreateCheep(string cheepText, Author author)
     {
@@ -90,6 +90,15 @@ public class CheepRepository : ICheepRepository
 
     _context.Cheeps.Add(cheep);
     await _context.SaveChangesAsync(); 
+    }
+
+    public async Task DeleteCheepsByAuthorId(int authorId)
+    {
+        var cheeps = _context.Cheeps.Where(c => c.AuthorId == authorId);
+
+        _context.Cheeps.RemoveRange(cheeps);
+
+        await _context.SaveChangesAsync();
     }
 
 

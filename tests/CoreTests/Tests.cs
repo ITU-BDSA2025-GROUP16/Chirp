@@ -24,12 +24,10 @@ public class Tests
 
 		var user = new Author
 		{
-			AuthorId = userId,
 			Name = username,
-			Email = email
+			Email = email,
 		};
 
-		Assert.Equal(userId, user.AuthorId);
 		Assert.Equal(username, user.Name);
 		Assert.Equal(email, user.Email);
 	}
@@ -39,7 +37,6 @@ public class Tests
 	{
 		var user = new Author
 		{
-			AuthorId = 12345,
 			Name = "Tester",
 			Email = "Tester@email.com"
 		};
@@ -51,13 +48,10 @@ public class Tests
 			CheepId = 99999,
 			Text = "Jeg hopper fra femte!",
 			TimeStamp = sentAt,
-			AuthorId = user.AuthorId,
 			Author = user
 		};
 
-		Assert.Equal(99999, message.CheepId);
 		Assert.Equal("Jeg hopper fra femte!", message.Text);
-		Assert.Equal(user.AuthorId, message.AuthorId);
 		Assert.Equal(user, message.Author);
 		Assert.Equal(sentAt, message.TimeStamp);
 	}
@@ -75,7 +69,6 @@ public class Tests
 
 		var a1 = new Author()
 		{
-			AuthorId = 1,
 			Name = "Roger Histand",
 			Email = "Roger+Histand@hotmail.com",
 			Cheeps = new List<Cheep>()
@@ -84,7 +77,6 @@ public class Tests
 		var c1 = new Cheep()
 		{
 			CheepId = 13,
-			AuthorId = a1.AuthorId,
 			Author = a1,
 			Text = "You are here for at all?",
 			TimeStamp = DateTimeOffset.FromUnixTimeSeconds(1690895598).UtcDateTime
@@ -121,7 +113,7 @@ public class Tests
 		context.Database.OpenConnection();
 		context.Database.EnsureCreated();
 
-		var author = new Author { AuthorId = 1, Name = "Test", Email = "test@test.com" };
+		var author = new Author { Name = "Test", Email = "test@test.com" };
 		context.Authors.Add(author);
 		context.SaveChanges();
 
@@ -146,7 +138,7 @@ public class Tests
 		context.Database.OpenConnection();
 		context.Database.EnsureCreated();
 
-		var author = new Author { AuthorId = 1, Name = "Test", Email = "test@test.com" };
+		var author = new Author { Name = "Test", Email = "test@test.com" };
 		context.Authors.Add(author);
 		context.SaveChanges();
 
@@ -183,7 +175,7 @@ public class Tests
     	Assert.NotNull(cheep);
     	Assert.Equal("This is a test!", cheep.Text);
     	Assert.Equal(author.Name, cheep.Author.Name);
-}
+	}
 	[Fact]
 	public void IntegrationMessageByUserDataBaseTest()
 	{
@@ -197,7 +189,6 @@ public class Tests
 
 		var a1 = new Author()
 		{
-			AuthorId = 1,
 			Name = "Roger Histand",
 			Email = "Roger+Histand@hotmail.com",
 			Cheeps = new List<Cheep>()
@@ -205,7 +196,6 @@ public class Tests
 
 		var a2 = new Author()
 		{
-			AuthorId = 2,
 			Name = "Luanna Muro",
 			Email = "Luanna-Muro@ku.dk",
 			Cheeps = new List<Cheep>()
@@ -214,7 +204,6 @@ public class Tests
 		var c1 = new Cheep()
 		{
 			CheepId = 13,
-			AuthorId = a1.AuthorId,
 			Author = a1,
 			Text = "You are here for at all?",
 			TimeStamp = DateTimeOffset.FromUnixTimeSeconds(1690895598).UtcDateTime
@@ -223,7 +212,6 @@ public class Tests
 		var c2 = new Cheep()
 		{
 			CheepId = 7,
-			AuthorId = a2.AuthorId,
 			Author = a2,
 			Text = "It was but a very ancient cluster of blocks generally painted green, and for no other, he shielded me.",
 			TimeStamp = DateTimeOffset.FromUnixTimeSeconds(1690895641).UtcDateTime
@@ -232,7 +220,6 @@ public class Tests
 		var c3 = new Cheep()
 		{
 			CheepId = 56,
-			AuthorId = a2.AuthorId,
 			Author = a2,
 			Text = "See how that murderer could be from any trivial business not connected with her.",
 			TimeStamp = DateTimeOffset.FromUnixTimeSeconds(1690895601).UtcDateTime
@@ -256,4 +243,36 @@ public class Tests
 		Assert.Equal("It was but a very ancient cluster of blocks generally painted green, and for no other, he shielded me.", cheeps[0].Message);
 		Assert.Equal("See how that murderer could be from any trivial business not connected with her.", cheeps[1].Message);
 	}
+
+	[Fact]
+	public async Task ForgetMe_DeletesUserCheeps()
+	{
+		var options = new DbContextOptionsBuilder<ChatDBContext>().UseSqlite("Data Source=:memory:").Options;
+
+		using var context = new ChatDBContext(options);
+		context.Database.OpenConnection();
+		context.Database.EnsureCreated();
+
+		var author = new Author { Name ="ForgetUser", Email ="forget@test.com" };
+		context.Authors.Add(author);
+		context.SaveChanges();
+
+		var cheep1 = new Cheep { Text ="Cheep 1", TimeStamp = DateTime.UtcNow, Author = author };
+		var cheep2 = new Cheep { Text ="Cheep 2", TimeStamp = DateTime.UtcNow, Author = author };
+		context.Cheeps.AddRange(cheep1, cheep2);
+		context.SaveChanges();
+
+		var cheepRepo = new CheepRepository(context);
+		var cheepService = new CheepService(cheepRepo);
+
+		await cheepService.DeleteUserData(author);
+
+		var remainingCheeps = context.Cheeps.Where(c => c.Author.Name == "ForgetUser").ToList();
+		Assert.Empty(remainingCheeps);
+
+		var userInDb = context.Authors.FirstOrDefault(a => a.Name == "ForgetUser");
+		Assert.NotNull(userInDb);
+	}
+
+	
 }

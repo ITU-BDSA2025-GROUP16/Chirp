@@ -39,6 +39,14 @@
                                     </button>
                                 </form>
                             }
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <form method="post" asp-page-handler="Like" style="display:inline;">
+                                    <input type="hidden" name="AuthorId" value="@cheep.AuthorId" />
+                                    <input type="hidden" name="Timestamp" value="@cheep.Timestamp" />
+                                    <button type="submit">Like 👍</button>
+                                </form>
+                            }
                         </div>
 
                         <p>

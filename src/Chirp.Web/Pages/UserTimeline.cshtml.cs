@@ -4,6 +4,8 @@ using Chirp.Core.Services;
 using Chirp.Core.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Chirp.Core.Domain;
+using Microsoft.AspNetCore.Authentication;
+
 
 namespace Chirp.Web.Pages;
 
@@ -121,5 +123,31 @@ public class UserTimelineModel : PageModel
         }
         
         return Redirect($"/user/{Author}");
+    }
+
+    public async Task<IActionResult> OnPostForgetMeAsync([FromServices] SignInManager<Author> signInManager)
+    {
+        Console.WriteLine("=== OnPostForgetMeAsync Called ===");
+        
+        var currentUser = await _userManager.GetUserAsync(User);
+        if (currentUser == null)
+        {
+            return RedirectToPage("/Public");
+        }
+
+        await _service.DeleteUserData(currentUser);
+
+        var result = await _userManager.DeleteAsync(currentUser);
+        if (!result.Succeeded)
+        {
+            ModelState.AddModelError(string.Empty, "Error deleting user account.");
+            return Page();
+        }
+
+        await signInManager.SignOutAsync();
+
+        Console.WriteLine("User account and data deleted.");
+
+        return RedirectToPage("/Public");
     }
 }

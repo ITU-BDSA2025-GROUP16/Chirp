@@ -1,0 +1,41 @@
+@page "/information"
+@model Chirp.Web.Pages.InformationPageModel
+@{
+    ViewData["Title"] = "information";
+    Layout = "Shared/_Layout";
+}
+
+@if (User.Identity != null && User.Identity.IsAuthenticated)
+{
+    <div>
+        <h2>About @User.Identity.Name</h2>
+        <p>Here is the information we have stored about you:</p>
+
+        <section>
+            <h3>User Details</h3>
+            <ul>
+                <li><strong>Name:</strong> @Model.Name</li>
+                <li><strong>Username:</strong> @Model.Username</li>
+                <li><strong>Email:</strong> @Model.Email</li>
+            </ul>
+        </section>
+
+        <section>
+            <h3>People You Follow</h3>
+            <!-- Add following list here -->
+        </section>
+
+        <section>
+            <h3>Your Cheeps</h3>
+            <!-- Add cheep-related information here -->
+        </section>
+
+        
+
+    </div>
+}
+else
+{
+    <p>You must be logged in to view this page.</p>
+    <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+}

@@ -69,3 +69,10 @@ packages/
 *.pem
 
 *.db
+
+# -----------------------
+# Claude Code
+# -----------------------
+.claude/
+.claude_code/
+.claudecode/

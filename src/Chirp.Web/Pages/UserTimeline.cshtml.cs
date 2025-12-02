@@ -13,6 +13,7 @@ public class UserTimelineModel : PageModel
 {
     private readonly ICheepService _service;
     private readonly IFollowService _followService;
+    private readonly ILikeService _likeService;
     private readonly UserManager<Author> _userManager;
     
     public List<CheepViewModel> Cheeps { get; set; } = new();
@@ -20,18 +21,23 @@ public class UserTimelineModel : PageModel
     public string? Author { get; set; } = string.Empty;
     public int? AuthorId { get; set; }
     public bool IsFollowing { get; set; } = false;
+    public HashSet<int> LikedCheepIds { get; set; } = new();
     
     [BindProperty]
     public string NewCheepText { get; set; } = string.Empty;
     
     [BindProperty]
     public int FollowedId { get; set; }
+
+    [BindProperty]
+    public int CheepId { get; set; }
     
 
-    public UserTimelineModel(ICheepService service, IFollowService followService, UserManager<Author> userManager)
+    public UserTimelineModel(ICheepService service, IFollowService followService, ILikeService likeService, UserManager<Author> userManager)
     {
         _service = service;
         _followService = followService;
+        _likeService = likeService;
         _userManager = userManager;
     }
 
@@ -61,6 +67,7 @@ public class UserTimelineModel : PageModel
             if (!string.IsNullOrEmpty(userIdString))
             {
                 int currentUserId = int.Parse(userIdString);
+                LikedCheepIds = await _likeService.GetLikedCheepIds(currentUserId);
                 
                 if (Cheeps.Any())
                 {
@@ -123,6 +130,36 @@ public class UserTimelineModel : PageModel
             Console.WriteLine("Followed!");
         }
         
+        return Redirect($"/user/{Author}");
+    }
+
+    public async Task<IActionResult> OnPostLikeAsync()
+    {
+        if (!User.Identity.IsAuthenticated)
+            return Forbid();
+
+        Author = RouteData.Values["author"]?.ToString();
+
+        var userIdString = _userManager.GetUserId(User);
+        if (string.IsNullOrEmpty(userIdString))
+        {
+            return Page();
+        }
+        int userId = int.Parse(userIdString);
+
+        bool isLiking = await _likeService.IsLiking(userId, CheepId);
+
+        if (isLiking)
+        {
+            await _likeService.UnLike(userId, CheepId);
+            Console.WriteLine("Unliked!");
+        }
+        else
+        {
+            await _likeService.Like(userId, CheepId);
+            Console.WriteLine("Liked!");
+        }
+
         return Redirect($"/user/{Author}");
     }
 }

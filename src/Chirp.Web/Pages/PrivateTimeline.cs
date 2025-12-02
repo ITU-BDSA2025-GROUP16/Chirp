@@ -10,7 +10,8 @@ namespace Chirp.Web.Pages;
 public class PrivateTimelineModel : PageModel
 {
     private readonly ICheepService _service;
-    private readonly IFollowService _followService; 
+    private readonly IFollowService _followService;
+    private readonly ILikeService _likeService;
     private readonly UserManager<Author> _userManager;
     
     public List<CheepViewModel> Cheeps { get; set; } = new();
@@ -18,6 +19,7 @@ public class PrivateTimelineModel : PageModel
     public string? Author { get; set; } = string.Empty;
 
     public HashSet<int> FollowedAuthorIds { get; set; } = new();
+    public HashSet<int> LikedCheepIds { get; set; } = new();
     
     [BindProperty]
     public string NewCheepText { get; set; } = string.Empty;
@@ -26,15 +28,19 @@ public class PrivateTimelineModel : PageModel
     public int FollowedId { get; set; } 
 
     [BindProperty]
+    public int CheepId { get; set; }
+
+    [BindProperty]
     public int AuthorId { get; set; }
 
     [BindProperty]
     public string Timestamp { get; set; }
 
-    public PrivateTimelineModel(ICheepService service, IFollowService followService, UserManager<Author> userManager) 
+    public PrivateTimelineModel(ICheepService service, IFollowService followService, ILikeService likeService, UserManager<Author> userManager) 
     {
         _service = service;
-        _followService = followService; 
+        _followService = followService;
+        _likeService = likeService;
         _userManager = userManager;
     }
 
@@ -67,11 +73,12 @@ public class PrivateTimelineModel : PageModel
         int userId = int.Parse(userIdString);
         
         FollowedAuthorIds = await _followService.GetFollowedIds(userId);
+        LikedCheepIds = await _likeService.GetLikedCheepIds(userId);
         var authorIdsToShow = new List<int>(FollowedAuthorIds) { userId };
         Cheeps = _service.GetCheepsFromFollowedAuthors(authorIdsToShow.ToList(), pageNumber);
     }
     
-        public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync()
     {
         Console.WriteLine("=== OnPostAsync Called ===");
         Author = User.Identity?.Name;
@@ -123,12 +130,33 @@ public class PrivateTimelineModel : PageModel
         
         return Redirect("/private/{author}");
     }
-    public IActionResult OnPostLike()
+
+    public async Task<IActionResult> OnPostLikeAsync()
     {
         if (!User.Identity.IsAuthenticated)
             return Forbid();
 
+        var userIdString = _userManager.GetUserId(User);
+        if (string.IsNullOrEmpty(userIdString))
+        {
+            return Page();
+        }
+        int userId = int.Parse(userIdString);
+
+        bool isLiking = await _likeService.IsLiking(userId, CheepId);
+
+        if (isLiking)
+        {
+            await _likeService.UnLike(userId, CheepId);
+            Console.WriteLine("Unliked!");
+        }
+        else
+        {
+            await _likeService.Like(userId, CheepId);
+            Console.WriteLine("Liked!");
+        }
+
         Console.WriteLine($"User {User.Identity.Name} liked cheep by {AuthorId} at {Timestamp}");
-        return RedirectToPage("/Public");
+        return Redirect("/private/{author}");
     }
 }

@@ -14,6 +14,6 @@ public interface ICheepRepository
 
   public List<CheepViewModel> GetCheepsFromFollowedAuthors(List<int> authorIds, int pageNumber = 1);
   public Task CreateCheep(string cheepText, Author author);
+  public Task DeleteCheepsByAuthorId(int authorId);
 
-  
 }

@@ -25,6 +25,12 @@ public class PrivateTimelineModel : PageModel
     [BindProperty]
     public int FollowedId { get; set; } 
 
+    [BindProperty]
+    public int AuthorId { get; set; }
+
+    [BindProperty]
+    public string Timestamp { get; set; }
+
     public PrivateTimelineModel(ICheepService service, IFollowService followService, UserManager<Author> userManager) 
     {
         _service = service;
@@ -116,5 +122,13 @@ public class PrivateTimelineModel : PageModel
         }
         
         return Redirect("/private/{author}");
+    }
+    public IActionResult OnPostLike()
+    {
+        if (!User.Identity.IsAuthenticated)
+            return Forbid();
+
+        Console.WriteLine($"User {User.Identity.Name} liked cheep by {AuthorId} at {Timestamp}");
+        return RedirectToPage("/Public");
     }
 }

@@ -13,6 +13,8 @@ public interface ICheepService
     public List<CheepViewModel> GetCheepsFromFollowedAuthors(List<int> authorIds, int pageNumber = 1); //A little akward but so that we can get followers cheeps from ID
 
     public Task CreateCheep(Author author, string text);
+    Task DeleteUserData(Author author);
+
 }
 
 public class CheepService : ICheepService
@@ -52,6 +54,11 @@ public class CheepService : ICheepService
         DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
         dateTime = dateTime.AddSeconds(unixTimeStamp);
         return dateTime.ToString("MM/dd/yy H:mm:ss");
+    }
+
+    public async Task DeleteUserData(Author author)
+    {
+        await _repo.DeleteCheepsByAuthorId(author.Id);
     }
 
 }

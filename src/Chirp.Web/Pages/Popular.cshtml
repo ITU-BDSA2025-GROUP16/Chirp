@@ -1,0 +1,54 @@
+@page "/popular"
+@model Chirp.Web.Pages.PopularModel
+@{
+    ViewData["Title"] = "Popular Cheeps!";
+    Layout = "Shared/_Layout";
+}
+
+<div>
+    <h2> Most Popular Cheeps - Page @Model.CurrentPage</h2>
+
+    @if (Model.Cheeps.Any())
+    {
+        <ul id="messagelist" class="cheeps">
+           @foreach (var cheep in Model.Cheeps)
+           {
+               <li>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <strong>
+                                <a href="/user/@cheep.Author">@cheep.Author</a>
+                            </strong>
+                            <small>&mdash; @cheep.Timestamp</small>
+                            <small>| Likes: @cheep.LikeCount</small>
+                            <p style="margin: 4px 0 0 0;">@cheep.Message</p>
+                        </div>
+
+                        @if (User.Identity?.IsAuthenticated == true && User.Identity?.Name != cheep.Author)
+                        {
+                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                <form method="post" asp-page-handler="Follow" style="margin:0;">
+                                    <input type="hidden" name="followedId" value="@cheep.AuthorId" />
+                                    <button type="submit" style="width: 110px;">
+                                        @(Model.FollowedAuthorIds.Contains(cheep.AuthorId) ? "Unfollow ❌" : "Follow 📌")
+                                    </button>
+                                </form>
+                                <form method="post" asp-page-handler="Like" style="margin:0;">
+                                    <input type="hidden" name="CheepId" value="@cheep.CheepId" />
+                                    <button type="submit" style="width: 110px;">
+                                        @(Model.LikedCheepIds.Contains(cheep.CheepId) ? "Unlike 👎" : "Like 👍")
+                                    </button>
+                                </form>
+                            </div>
+                        }
+                    
+                    </div>
+                </li>
+           }
+        </ul>
+    }
+    else
+    {
+        <em>There are no cheeps so far.</em>
+    }
+</div>

@@ -15,6 +15,8 @@ public interface ICheepService
     public Task CreateCheep(Author author, string text);
     Task DeleteUserData(Author author);
 
+    public List<CheepViewModel> GetCheepsByLikes(int pageNumber = 1);
+
 }
 
 public class CheepService : ICheepService
@@ -61,4 +63,8 @@ public class CheepService : ICheepService
         await _repo.DeleteCheepsByAuthorId(author.Id);
     }
 
+public List<CheepViewModel> GetCheepsByLikes(int pageNumber = 1)
+{
+    return _repo.GetCheepsByLikes(pageNumber);
+}
 }

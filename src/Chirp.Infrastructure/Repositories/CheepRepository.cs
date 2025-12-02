@@ -107,5 +107,27 @@ public class CheepRepository : ICheepRepository
         await _context.SaveChangesAsync();
     }
 
+public List<CheepViewModel> GetCheepsByLikes(int pageNumber = 1)
+{
+    int pageSize = 32;
+    
+    var cheeps = _context.Cheeps
+        .Include(c => c.Author)
+        .Select(c => new CheepViewModel(
+            c.Author.Name,
+            c.Text,
+            c.TimeStamp.ToString(),
+            c.AuthorId,
+            c.CheepId,
+            _context.Likes.Count(l => l.LikedCheepId == c.CheepId)
+        ))
+        .ToList();
 
+    return cheeps
+        .OrderByDescending(c => c.LikeCount)
+        .ThenByDescending(c => c.Timestamp)
+        .Skip((pageNumber - 1) * pageSize)
+        .Take(pageSize)
+        .ToList();
+}
 }

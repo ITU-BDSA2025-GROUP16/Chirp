@@ -31,7 +31,8 @@ public class CheepRepository : ICheepRepository
                 c.Text,
                 c.TimeStamp.ToString("MM/dd/yy H:mm:ss"),
                 c.Author.Id,
-                c.CheepId
+                c.CheepId,
+    _context.Likes.Count(l => l.LikedCheepId == c.CheepId)
             ))
             .ToList();
     }
@@ -51,7 +52,8 @@ public class CheepRepository : ICheepRepository
                 c.Text,
                 c.TimeStamp.ToString("MM/dd/yy H:mm:ss"),
                 c.Author.Id,
-                c.CheepId
+                c.CheepId,
+    _context.Likes.Count(l => l.LikedCheepId == c.CheepId)
             ))
             .ToList();
     }
@@ -75,7 +77,8 @@ public class CheepRepository : ICheepRepository
             c.Text,
             c.TimeStamp.ToString("MM/dd/yy H:mm:ss"),
             c.Author.Id,
-                c.CheepId
+                c.CheepId,
+    _context.Likes.Count(l => l.LikedCheepId == c.CheepId)
         ))
         .ToList();
     }

@@ -16,6 +16,8 @@ public class ChatDBContext : IdentityDbContext<Author, IdentityRole<int>, int>
     public DbSet<Author> Authors { get; set; } = null!;
     public DbSet<Follow> Follows { get; set; } = null!;
 
+    public DbSet<Like> Likes { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -37,6 +39,12 @@ public class ChatDBContext : IdentityDbContext<Author, IdentityRole<int>, int>
             b.HasIndex(f => f.FollowedId);
         });
 
-        
+        builder.Entity<Like>(b =>
+{
+    b.HasKey(l => new { l.LikerId, l.LikedCheepId });
+    
+    b.HasIndex(l => l.LikerId);
+    b.HasIndex(l => l.LikedCheepId);
+});
     }
 }

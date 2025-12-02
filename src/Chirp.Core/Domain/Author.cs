@@ -15,10 +15,8 @@ public class Author : IdentityUser<int>
         {
             _email = value ?? string.Empty;
 
-            // Set UserName to the email
             UserName = _email;
 
-            // If Name is empty, also set it to the email
             if (string.IsNullOrWhiteSpace(Name))
             {
                 Name = _email;
@@ -27,8 +25,7 @@ public class Author : IdentityUser<int>
     }
     
 
-    // Navigation property
     public ICollection<Cheep> Cheeps { get; set; } = new List<Cheep>();
-    public ICollection<Author> Follows { get; set; } = new List<Author>();
+ 
 
 }

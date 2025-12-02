@@ -11,7 +11,6 @@ public class Cheep
     public string Text { get; set; } = string.Empty;
     public DateTime TimeStamp { get; set; }
 
-    // Foreign key + navigation property
     public int AuthorId { get; set; }
     public Author Author { get; set; } = null!;
 }

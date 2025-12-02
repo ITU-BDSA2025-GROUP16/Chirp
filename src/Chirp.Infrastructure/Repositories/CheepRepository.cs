@@ -30,7 +30,8 @@ public class CheepRepository : ICheepRepository
                 c.Author.Name,
                 c.Text,
                 c.TimeStamp.ToString("MM/dd/yy H:mm:ss"),
-                c.Author.Id
+                c.Author.Id,
+                c.CheepId
             ))
             .ToList();
     }
@@ -49,7 +50,8 @@ public class CheepRepository : ICheepRepository
                 c.Author.Name,
                 c.Text,
                 c.TimeStamp.ToString("MM/dd/yy H:mm:ss"),
-                c.Author.Id
+                c.Author.Id,
+                c.CheepId
             ))
             .ToList();
     }
@@ -72,7 +74,8 @@ public class CheepRepository : ICheepRepository
             c.Author.Name,
             c.Text,
             c.TimeStamp.ToString("MM/dd/yy H:mm:ss"),
-            c.Author.Id
+            c.Author.Id,
+                c.CheepId
         ))
         .ToList();
     }

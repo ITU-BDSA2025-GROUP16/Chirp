@@ -28,12 +28,13 @@
                 </button>
             </form>
         }
-        @if (User.Identity.IsAuthenticated)
+        @if (User.Identity?.IsAuthenticated == true  && User.Identity?.Name != cheep.Author)
         {
             <form method="post" asp-page-handler="Like" style="display:inline;">
-                <input type="hidden" name="AuthorId" value="@cheep.AuthorId" />
-                <input type="hidden" name="Timestamp" value="@cheep.Timestamp" />
-                <button type="submit">Like 👍</button>
+                <input type="hidden" name="CheepId" value="@cheep.CheepId" />
+                <button type="submit" style="width: 90px;">
+                    @(Model.LikedCheepIds.Contains(cheep.CheepId) ? "Liked 👍" : "Like 👍")
+                </button>
             </form>
         }
     </div>

@@ -3,7 +3,7 @@ using Chirp.Core.Domain;
 
 namespace Chirp.Core.Services;
 
-public record CheepViewModel(string Author, string Message, string Timestamp, int AuthorId);
+public record CheepViewModel(string Author, string Message, string Timestamp, int AuthorId, int CheepId);
 
 public interface ICheepService
 {

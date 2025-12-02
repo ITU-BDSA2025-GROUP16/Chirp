@@ -13,6 +13,7 @@ public class PublicModel : PageModel
 {
     private readonly ICheepService _service;
     private readonly IFollowService _serviceA;
+    private readonly ILikeService _likeService;
 
     private readonly UserManager<Author> _userManager;
     private Author? _currentUser;
@@ -22,9 +23,13 @@ public class PublicModel : PageModel
     public int CurrentPage { get; set; } = 1;
 
     public HashSet<int> FollowedAuthorIds { get; set; } = new();
+    public HashSet<int> LikedCheepIds { get; set; } = new();
     
     [BindProperty]
     public int FollowedId { get; set; }
+
+    [BindProperty]
+    public int CheepId { get; set; }
 
     [BindProperty]
     public int AuthorId { get; set; }
@@ -32,12 +37,13 @@ public class PublicModel : PageModel
     [BindProperty]
     public string Timestamp { get; set; }
     
-    public PublicModel(ICheepService service, IFollowService serviceA, UserManager<Author> userManager)
+    public PublicModel(ICheepService service, IFollowService serviceA, ILikeService likeService, UserManager<Author> userManager)
     {
         _service = service;
         _userManager = userManager;
 
         _serviceA = serviceA;
+        _likeService = likeService;
     }
 
     public async Task OnGetAsync() {
@@ -58,6 +64,7 @@ public class PublicModel : PageModel
             {
                 int userId = int.Parse(userIdString);
                 FollowedAuthorIds = await _serviceA.GetFollowedIds(userId);
+                LikedCheepIds = await _likeService.GetLikedCheepIds(userId);
             }
         }
     }
@@ -124,12 +131,33 @@ public class PublicModel : PageModel
 
         return Redirect("/");
     }
-    public IActionResult OnPostLike()
+
+    public async Task<IActionResult> OnPostLikeAsync()
     {
         if (!User.Identity.IsAuthenticated)
             return Forbid();
 
+        var userIdString = _userManager.GetUserId(User);
+        if (string.IsNullOrEmpty(userIdString))
+        {
+            return Page();
+        }
+        int userId = int.Parse(userIdString);
+
+        bool isLiking = await _likeService.IsLiking(userId, CheepId);
+
+        if (isLiking)
+        {
+            await _likeService.UnLike(userId, CheepId);
+            Console.WriteLine("Unliked!");
+        }
+        else
+        {
+            await _likeService.Like(userId, CheepId);
+            Console.WriteLine("Liked!");
+        }
+
         Console.WriteLine($"User {User.Identity.Name} liked cheep by {AuthorId} at {Timestamp}");
-        return RedirectToPage("/public");
+        return Redirect("/");
     }
 }

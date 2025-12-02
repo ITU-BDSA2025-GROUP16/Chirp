@@ -43,4 +43,12 @@ public class LikeRepository : ILikeRepository
         return await _context.Likes
             .AnyAsync(l => l.LikerId == likerId && l.LikedCheepId == likedCheepId);
     }
+
+       public async Task<HashSet<int>> GetLikedCheepIds(int likerId)
+{
+    return await _context.Likes
+        .Where(l => l.LikerId == likerId)
+        .Select(l => l.LikedCheepId)
+        .ToHashSetAsync();
+}
 }

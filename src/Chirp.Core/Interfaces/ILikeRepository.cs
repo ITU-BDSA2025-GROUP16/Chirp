@@ -9,5 +9,5 @@ public interface ILikeRepository
     public Task UnLike(int follower, int followed);
     public Task<bool> IsLiking(int follower, int followed);
 
-    //public Task<HashSet<int>> GetFollowedIds(int followerId);
+    public Task<HashSet<int>> GetLikedCheepIds(int followerId);
 }

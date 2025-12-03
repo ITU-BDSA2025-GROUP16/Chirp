@@ -15,6 +15,8 @@ public class InformationPageModel : PageModel
     private readonly ICheepService _service;
     private readonly IFollowService _followService; 
 
+    private readonly ILikeService _likeService;
+
     private readonly UserManager<Author> _userManager;
     private readonly IAuthorRepository _authorRepository;
     
@@ -32,12 +34,13 @@ public class InformationPageModel : PageModel
     public List<Author> FollowedAuthors { get; set; } = new();
     
 
-    public InformationPageModel(ICheepService service, IFollowService followService, UserManager<Author> userManager, IAuthorRepository authorRepository)
+    public InformationPageModel(ICheepService service, IFollowService followService, ILikeService likeService, UserManager<Author> userManager, IAuthorRepository authorRepository)
     {
          _service = service;
          _followService = followService;
         _userManager = userManager;
         _authorRepository = authorRepository;
+        _likeService = likeService;
     }
 
     public async Task OnGetAsync()
@@ -109,6 +112,8 @@ public class InformationPageModel : PageModel
         }
 
         await _service.DeleteUserData(currentUser);
+        await _followService.DeleteFollowersData(currentUser);
+        await _likeService.DeleteLikesData(currentUser);
 
         var result = await _userManager.DeleteAsync(currentUser);
         if (!result.Succeeded)

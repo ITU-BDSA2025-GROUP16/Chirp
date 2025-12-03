@@ -10,6 +10,7 @@ public interface IFollowService
     public Task<bool> IsFollowing(int follower, int followed); 
 
     public Task<HashSet<int>> GetFollowedIds(int followerId); //To check who is following
+    Task DeleteFollowersData(Author author); 
 }
 
 public class FollowService : IFollowService
@@ -40,4 +41,8 @@ public class FollowService : IFollowService
 {
     return await _repo.GetFollowedIds(followerId);
 }
+    public async Task DeleteFollowersData(Author author)
+    {
+        await _repo.DeleteFollowersByAuthorId(author.Id);
+    }
 }

@@ -47,10 +47,18 @@ public class FollowRepository : IFollowRepository
     }
 
     public async Task<HashSet<int>> GetFollowedIds(int followerId)
-{
-    return await _context.Follows
+    {
+        return await _context.Follows
         .Where(f => f.FollowerId == followerId)
         .Select(f => f.FollowedId)
         .ToHashSetAsync();
-}
+    }
+    public async Task DeleteFollowersByAuthorId(int authorId)
+    {
+        var followers = _context.Follows.Where(f => f.FollowerId == authorId);
+
+        _context.Follows.RemoveRange(followers);
+
+        await _context.SaveChangesAsync();
+    }
 } 

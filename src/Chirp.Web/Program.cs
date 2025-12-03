@@ -29,6 +29,8 @@ builder.Services.AddScoped<ICheepService, CheepService>();
 builder.Services.AddScoped<ICheepRepository, CheepRepository>();
 builder.Services.AddScoped<IFollowService, FollowService>();    
 builder.Services.AddScoped<IFollowRepository, FollowRepository>(); 
+builder.Services.AddScoped<ILikeRepository, LikeRepository>();
+builder.Services.AddScoped<ILikeService, LikeService>();
 
 builder.Services.AddRazorPages();
 

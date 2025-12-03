@@ -3,7 +3,7 @@ using Chirp.Core.Domain;
 
 namespace Chirp.Core.Services;
 
-public record CheepViewModel(string Author, string Message, string Timestamp, int AuthorId);
+public record CheepViewModel(string Author, string Message, string Timestamp, int AuthorId, int CheepId, int LikeCount);
 
 public interface ICheepService
 {
@@ -14,6 +14,8 @@ public interface ICheepService
 
     public Task CreateCheep(Author author, string text);
     Task DeleteUserData(Author author);
+
+    public List<CheepViewModel> GetCheepsByLikes(int pageNumber = 1);
 
 }
 
@@ -61,4 +63,8 @@ public class CheepService : ICheepService
         await _repo.DeleteCheepsByAuthorId(author.Id);
     }
 
+public List<CheepViewModel> GetCheepsByLikes(int pageNumber = 1)
+{
+    return _repo.GetCheepsByLikes(pageNumber);
+}
 }

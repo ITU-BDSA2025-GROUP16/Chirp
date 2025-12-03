@@ -14,34 +14,36 @@
            @foreach (var cheep in Model.Cheeps)
            {
                <li>
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <strong>
-            <a href="/user/@cheep.Author">@cheep.Author</a>
-        </strong>
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+    <strong>
+        <a href="/user/@cheep.Author">@cheep.Author</a>
+    </strong>
+    <small>&mdash; @cheep.Timestamp</small>
+    <small>| Likes:  @cheep.LikeCount</small>
+    <p style="margin: 4px 0 0 0;">@cheep.Message</p>
+</div>
 
         @if (User.Identity?.IsAuthenticated == true && User.Identity?.Name != cheep.Author)
-        {
-           <form method="post" asp-page-handler="Follow" style="margin:0;">
-                <input type="hidden" name="followedId" value="@cheep.AuthorId" />
-                <button type="submit" style="width: 90px;">
-                    @(Model.FollowedAuthorIds.Contains(cheep.AuthorId) ? "Unfollow" : "Follow")
-                </button>
-            </form>
-        }
-        @if (User.Identity.IsAuthenticated)
-        {
-            <form method="post" asp-page-handler="Like" style="display:inline;">
-                <input type="hidden" name="AuthorId" value="@cheep.AuthorId" />
-                <input type="hidden" name="Timestamp" value="@cheep.Timestamp" />
-                <button type="submit">Like 👍</button>
-            </form>
-        }
+{
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+        <form method="post" asp-page-handler="Follow" style="margin:0;">
+            <input type="hidden" name="followedId" value="@cheep.AuthorId" />
+            <button type="submit" style="width: 110px;">
+                @(Model.FollowedAuthorIds.Contains(cheep.AuthorId) ? "Unfollow ❌" : "Follow 📌")
+            </button>
+        </form>
+        <form method="post" asp-page-handler="Like" style="margin:0;">
+            <input type="hidden" name="CheepId" value="@cheep.CheepId" />
+            <button type="submit" style="width: 110px;">
+                @(Model.LikedCheepIds.Contains(cheep.CheepId) ? "Unlike 👎" : "Like 👍")
+            </button>
+        </form>
+    </div>
+}
     </div>
 
-    <p>
-        @cheep.Message
-        <small>&mdash; @cheep.Timestamp</small>
-    </p>
+
 </li>
            }
         </ul>

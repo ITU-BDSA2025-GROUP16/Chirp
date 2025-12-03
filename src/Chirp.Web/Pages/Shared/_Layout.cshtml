@@ -26,22 +26,24 @@
         }
 
         @if (User.Identity.IsAuthenticated)
-        {
-            <div>
-                <a href="/private/@(displayName)">my timeline</a> |
-                <a href="/">public timeline</a> |
-                <a href="/information">information page</a> |
-                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Logout">Logout [@displayName]</a>
-            </div>
-        }
-        else
-        {
-            <div>
-                <a href="/">public timeline</a> |
-                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
-                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
-            </div>
-        }
+{
+    <div>
+        <a href="/private/@(displayName)">my timeline</a> |
+        <a href="/">public timeline</a> |
+        <a href="/popular"> popular</a> |
+        <a href="/information">information page</a> |
+        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Logout">Logout [@displayName]</a>
+    </div>
+}
+else
+{
+    <div>
+        <a href="/">public timeline</a> |
+        <a href="/popular"> popular</a> |
+        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+    </div>
+}
     </div>
 
     <div class=body>

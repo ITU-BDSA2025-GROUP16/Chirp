@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Authentication;
 using MyChat.Razor.Tests;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Identity;
+using Chirp.Core.Domain;
 
 namespace Chirp.Web;
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
@@ -59,9 +61,10 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             {
                 var scopedServices = scope.ServiceProvider;
                 var db = scopedServices.GetRequiredService<ChatDBContext>();
+                var userManager = scopedServices.GetRequiredService<UserManager<Author>>();
 
                 db.Database.EnsureCreated();
-
+                DbInitializer.SeedDatabase(db, userManager);
             }
         });
     }

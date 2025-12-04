@@ -26,7 +26,18 @@ public static class DbInitializer
             var a11 = new Author() {Name = "Helge", Email = "ropf@itu.dk"};
             var a12 = new Author() { Name = "Adrian", Email = "adho@itu.dk"};
 
-            var authors = new List<Author>() { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 };
+            // Create all authors through UserManager with default password
+             userManager.CreateAsync(a1, "TestPassword123!").Wait();
+            userManager.CreateAsync(a2, "TestPassword123!").Wait();
+            userManager.CreateAsync(a3, "TestPassword123!").Wait();
+            userManager.CreateAsync(a4, "TestPassword123!").Wait();
+            userManager.CreateAsync(a5, "TestPassword123!").Wait();
+            userManager.CreateAsync(a6, "TestPassword123!").Wait();
+            userManager.CreateAsync(a7, "TestPassword123!").Wait();
+            userManager.CreateAsync(a8, "TestPassword123!").Wait();
+            userManager.CreateAsync(a9, "TestPassword123!").Wait();
+            userManager.CreateAsync(a10, "TestPassword123!").Wait();
+           
         
             userManager.CreateAsync(a11, "LetM31n!").Wait();
             userManager.CreateAsync(a12, "M32Want_Access").Wait();
@@ -703,7 +714,6 @@ public static class DbInitializer
             a11.Cheeps = new List<Cheep>() { c656 };
             a12.Cheeps = new List<Cheep>() { c657 };
 
-            chirpContext.Authors.AddRange(authors);
             chirpContext.Cheeps.AddRange(cheeps);
             chirpContext.SaveChanges();
         }

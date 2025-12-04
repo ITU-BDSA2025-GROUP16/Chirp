@@ -6,6 +6,7 @@ using Chirp.Web;
 namespace MyChat.Razor.Tests;
 
 public class ApiTests : IClassFixture<CustomWebApplicationFactory>
+
 {
     //Tests for website using temporary version
     private readonly CustomWebApplicationFactory _factory;
@@ -21,7 +22,7 @@ public class ApiTests : IClassFixture<CustomWebApplicationFactory>
     public async Task PublicTimeline_ReturnsSuccessStatusCode()
     {
          //Act
-        var response = await _client.GetAsync("/");
+        var response = await _client.GetAsync("/Public");
 
         //Assert
         response.EnsureSuccessStatusCode();
@@ -66,7 +67,7 @@ public class ApiTests : IClassFixture<CustomWebApplicationFactory>
     public async Task PublicTimeline_ContainsPublicTimelineHeader()
     {
         //Act
-        var response = await _client.GetAsync("/");
+        var response = await _client.GetAsync("/Public");
         var content = await response.Content.ReadAsStringAsync();
 
         //Assert

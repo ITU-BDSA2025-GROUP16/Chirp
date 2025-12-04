@@ -1,5 +1,6 @@
 using Chirp.Core.Interfaces;
 using Chirp.Core.Domain;
+using Chirp.Core.DTO;
 
 namespace Chirp.Core.Services;
 
@@ -37,17 +38,44 @@ public class CheepService : ICheepService
     // These would normally be loaded from a database for example
     public List<CheepViewModel> GetCheeps(int pageNumber = 1)
     {
-        return _repo.GetCheeps(pageNumber);
+        var dtos = _repo.GetCheeps(pageNumber);
+
+    return dtos.Select(dto => new CheepViewModel(
+        dto.AuthorName,
+        dto.Message,
+        dto.Timestamp.ToString("g"),
+        dto.AuthorId,
+        dto.CheepId,
+        dto.LikeCount
+    )).ToList();
     }
 
     public List<CheepViewModel> GetCheepsFromAuthor(string author, int pageNumber = 1)
     {
-        return _repo.GetCheepsFromAuthor(author, pageNumber);
+        var dtos = _repo.GetCheepsFromAuthor(author, pageNumber);
+
+    return dtos.Select(dto => new CheepViewModel(
+        dto.AuthorName,
+        dto.Message,
+        dto.Timestamp.ToString("g"),
+        dto.AuthorId,
+        dto.CheepId,
+        dto.LikeCount
+    )).ToList();
     }
 
     public List<CheepViewModel> GetCheepsFromFollowedAuthors(List<int> authorIds, int pageNumber = 1)
 {
-    return _repo.GetCheepsFromFollowedAuthors(authorIds, pageNumber);
+    var dtos = _repo.GetCheepsFromFollowedAuthors(authorIds, pageNumber);
+
+    return dtos.Select(dto => new CheepViewModel(
+        dto.AuthorName,
+        dto.Message,
+        dto.Timestamp.ToString("g"),
+        dto.AuthorId,
+        dto.CheepId,
+        dto.LikeCount
+    )).ToList();
 }
 
     private static string UnixTimeStampToDateTimeString(double unixTimeStamp)
@@ -65,6 +93,15 @@ public class CheepService : ICheepService
 
 public List<CheepViewModel> GetCheepsByLikes(int pageNumber = 1)
 {
-    return _repo.GetCheepsByLikes(pageNumber);
+     var dtos = _repo.GetCheepsByLikes(pageNumber);
+
+    return dtos.Select(dto => new CheepViewModel(
+        dto.AuthorName,
+        dto.Message,
+        dto.Timestamp.ToString("g"),
+        dto.AuthorId,
+        dto.CheepId,
+        dto.LikeCount
+    )).ToList();
 }
 }

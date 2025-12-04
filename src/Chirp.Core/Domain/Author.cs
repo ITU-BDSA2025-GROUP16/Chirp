@@ -14,13 +14,7 @@ public class Author : IdentityUser<int>
         set
         {
             _email = value ?? string.Empty;
-
             UserName = _email;
-
-            if (string.IsNullOrWhiteSpace(Name))
-            {
-                Name = _email;
-            }
         }
     }
     

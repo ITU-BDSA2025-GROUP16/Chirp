@@ -10,4 +10,6 @@ public interface IFollowRepository
     public Task<bool> IsFollowing(int follower, int followed);
 
     public Task<HashSet<int>> GetFollowedIds(int followerId);
+
+    public Task DeleteFollowersByAuthorId(int authorId);
 }

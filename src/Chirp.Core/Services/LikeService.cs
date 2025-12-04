@@ -9,7 +9,8 @@ public interface ILikeService
     public Task UnLike(int Liker, int Liked);
     public Task<bool> IsLiking(int Liker, int Liked); 
 
-    public Task<HashSet<int>> GetLikedCheepIds(int followerId); 
+    public Task<HashSet<int>> GetLikedCheepIds(int followerId);
+    Task DeleteLikesData(Author author); 
 }
 
 public class LikeService : ILikeService
@@ -40,4 +41,8 @@ public class LikeService : ILikeService
 {
     return await _repo.GetLikedCheepIds(followerId);
 }
+public async Task DeleteLikesData(Author author)
+    {
+        await _repo.DeleteLikesByAuthorId(author.Id);
+    }
 }

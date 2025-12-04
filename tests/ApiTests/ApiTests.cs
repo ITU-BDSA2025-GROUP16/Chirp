@@ -1,16 +1,17 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
+using Chirp.Web;
 
 namespace MyChat.Razor.Tests;
 
-public class ApiTests : IClassFixture<WebApplicationFactory<Program>> 
+public class ApiTests : IClassFixture<CustomWebApplicationFactory>
 {
     //Tests for website using temporary version
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly CustomWebApplicationFactory _factory;
     private readonly HttpClient _client;
 
-    public ApiTests(WebApplicationFactory<Program> factory)
+    public ApiTests(CustomWebApplicationFactory factory)
     {
         _factory = factory;
         _client = factory.CreateClient();
@@ -31,9 +32,9 @@ public class ApiTests : IClassFixture<WebApplicationFactory<Program>>
     public async Task PublicTimeline_ContainsHelgeCheep()
     {
          //Act
-        var response = await _client.GetAsync("/Roger%20Histand");
+        var response = await _client.GetAsync("/user/Roger%20Histand");
         var content = await response.Content.ReadAsStringAsync();
-        
+
         //Assert
         Assert.Contains("understand", content);
     }
@@ -42,7 +43,7 @@ public class ApiTests : IClassFixture<WebApplicationFactory<Program>>
     public async Task UserTimeline_Adrian_ReturnsSuccessStatusCode()
     {
         //Act
-        var response = await _client.GetAsync("/Adrian");
+        var response = await _client.GetAsync("/user/Adrian");
 
         //Assert
         response.EnsureSuccessStatusCode();
@@ -53,7 +54,7 @@ public class ApiTests : IClassFixture<WebApplicationFactory<Program>>
     public async Task UserTimeline_Adrian_ContainsAdrianCheep()
     {
         //Act
-        var response = await _client.GetAsync("/Adrian");
+        var response = await _client.GetAsync("/user/Adrian");
         var content = await response.Content.ReadAsStringAsync();
 
         //Assert
@@ -76,7 +77,7 @@ public class ApiTests : IClassFixture<WebApplicationFactory<Program>>
     public async Task UserTimeline_ContainsUsernameInHeader()
     {
         //Act
-        var response = await _client.GetAsync("/Adrian");
+        var response = await _client.GetAsync("/user/Adrian");
         var content = await response.Content.ReadAsStringAsync();
 
         //Assert

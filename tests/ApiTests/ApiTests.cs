@@ -27,7 +27,7 @@ public class ApiTests : IClassFixture<CustomWebApplicationFactory>
         //Assert
         response.EnsureSuccessStatusCode();
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-    }
+    } //git
 
     [Fact]
     public async Task PublicTimeline_ContainsHelgeCheep()

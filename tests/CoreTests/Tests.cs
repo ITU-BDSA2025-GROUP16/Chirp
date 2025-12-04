@@ -9,6 +9,7 @@ using Chirp.Core.Interfaces;
 using Chirp.Core.Domain;
 using Chirp.Core.Services;
 using Xunit;
+using Chirp.Core.DTO;
 
 namespace Chirp.Web;
 public class Tests
@@ -90,12 +91,12 @@ public class Tests
 		var cheeps = facade.GetCheeps();
 
 		DateTimeOffset dateTime = DateTimeOffset.FromUnixTimeSeconds(1690895598);
-		string formatted = dateTime.UtcDateTime.ToString("MM/dd/yy H:mm:ss");
 
 		Assert.Single(cheeps);
-		Assert.Equal("Roger Histand", cheeps[0].Author);
+		Assert.Equal("Roger+Histand@hotmail.com", cheeps[0].AuthorName);
 		Assert.Equal("You are here for at all?", cheeps[0].Message);
-		Assert.Equal(formatted, cheeps[0].Timestamp);
+		
+		Assert.Equal(dateTime.UtcDateTime, cheeps[0].Timestamp);
 	}
 
 
@@ -235,11 +236,11 @@ public class Tests
 		var db = new CheepRepository(context);
 		var service = new CheepService(db);
 
-		var cheeps = service.GetCheepsFromAuthor("Luanna Muro");
+		var cheeps = service.GetCheepsFromAuthor("Luanna-Muro@ku.dk");
 
 		Assert.Equal(2, cheeps.Count);
-		Assert.Equal("Luanna Muro", cheeps[0].Author);
-		Assert.Equal("Luanna Muro", cheeps[1].Author);
+		Assert.Equal("Luanna-Muro@ku.dk", cheeps[0].Author);
+		Assert.Equal("Luanna-Muro@ku.dk", cheeps[1].Author);
 		Assert.Equal("It was but a very ancient cluster of blocks generally painted green, and for no other, he shielded me.", cheeps[0].Message);
 		Assert.Equal("See how that murderer could be from any trivial business not connected with her.", cheeps[1].Message);
 	}

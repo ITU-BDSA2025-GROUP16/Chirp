@@ -10,4 +10,6 @@ public interface ILikeRepository
     public Task<bool> IsLiking(int follower, int followed);
 
     public Task<HashSet<int>> GetLikedCheepIds(int followerId);
+
+    public Task DeleteLikesByAuthorId(int authorId);
 }

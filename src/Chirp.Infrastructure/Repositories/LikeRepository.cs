@@ -51,4 +51,12 @@ public class LikeRepository : ILikeRepository
         .Select(l => l.LikedCheepId)
         .ToHashSetAsync();
 }
+    public async Task DeleteLikesByAuthorId(int authorId)
+    {
+        var likes = _context.Likes.Where(l => l.LikerId == authorId);
+
+        _context.Likes.RemoveRange(likes);
+
+        await _context.SaveChangesAsync();
+    }
 }

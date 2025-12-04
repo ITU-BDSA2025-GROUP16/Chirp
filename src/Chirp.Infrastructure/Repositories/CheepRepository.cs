@@ -4,6 +4,7 @@ using Chirp.Core.Interfaces;
 using Chirp.Infrastructure.Data;
 using Chirp.Core.Services;
 using Chirp.Core.Domain; 
+using Chirp.Core.DTO;
 
 
 namespace Chirp.Infrastructure.Repositories;
@@ -16,71 +17,76 @@ public class CheepRepository : ICheepRepository
     {
         _context = context;
     }
-    public List<CheepViewModel> GetCheeps(int pageNumber = 1)
+    public List<CheepDTO> GetCheeps(int pageNumber = 1)
     {
         int limit = 32;
         int offset = (pageNumber - 1) * limit;
 
-        return _context.Cheeps
-            .Include(c => c.Author)
-            .OrderByDescending(c => c.TimeStamp)
-            .Skip(offset)
-            .Take(limit)
-            .Select(c => new CheepViewModel(
-                c.Author.Name,
-                c.Text,
-                c.TimeStamp.ToString("MM/dd/yy H:mm:ss"),
-                c.Author.Id,
-                c.CheepId,
-    _context.Likes.Count(l => l.LikedCheepId == c.CheepId)
-            ))
-            .ToList();
+        var cheeps = _context.Cheeps
+        .Include(c => c.Author)
+        .OrderByDescending(c => c.TimeStamp)
+        .Skip(offset)
+        .Take(limit)
+        .ToList();
+
+    return cheeps.Select(c => new CheepDTO(
+        c.CheepId,
+        c.AuthorId,
+        c.Author.UserName,
+        c.Text,
+        c.TimeStamp,
+        _context.Likes.Count(l => l.LikedCheepId == c.CheepId)
+    )).ToList();
     }
-    public List<CheepViewModel> GetCheepsFromAuthor(string author, int pageNumber = 1)
+    public List<CheepDTO> GetCheepsFromAuthor(string author, int pageNumber = 1)
     {
         int limit = 32;
         int offset = (pageNumber - 1) * limit;
 
-        return _context.Cheeps
-            .Include(c => c.Author)
-            .Where(c => c.Author.Name == author)
-            .OrderByDescending(c => c.TimeStamp)
-            .Skip(offset)
-            .Take(limit)
-            .Select(c => new CheepViewModel(
-                c.Author.Name,
-                c.Text,
-                c.TimeStamp.ToString("MM/dd/yy H:mm:ss"),
-                c.Author.Id,
-                c.CheepId,
-    _context.Likes.Count(l => l.LikedCheepId == c.CheepId)
-            ))
-            .ToList();
+        var cheeps = _context.Cheeps
+        .Include(c => c.Author)
+        .Where(c => c.Author.UserName == author)
+        .OrderByDescending(c => c.TimeStamp)
+        .Skip(offset)
+        .Take(limit)
+        .ToList();
+
+       return cheeps.Select(c => new CheepDTO(
+        c.CheepId,
+        c.AuthorId,
+        c.Author.UserName,
+        c.Text,
+        c.TimeStamp,
+        _context.Likes.Count(l => l.LikedCheepId == c.CheepId)
+    )).ToList();
     }
 
-    public List<CheepViewModel> GetCheepsFromFollowedAuthors(List<int> authorIds, int pageNumber = 1)
+    public List<CheepDTO> GetCheepsFromFollowedAuthors(List<int> authorIds, int pageNumber = 1)
     {
     const int pageSize = 32;
     
     if (!authorIds.Any())
     {
-        return new List<CheepViewModel>();
+        return new List<CheepDTO>();
     }
+
+    var cheeps = _context.Cheeps
+    .Include(c => c.Author)
+    .Where(c => authorIds.Contains(c.AuthorId))
+    .OrderByDescending(c => c.TimeStamp)
+    .Skip((pageNumber - 1) * pageSize)
+    .Take(pageSize)
+    .ToList();
+
     
-    return _context.Cheeps
-        .Where(c => authorIds.Contains(c.AuthorId))
-        .OrderByDescending(c => c.TimeStamp)
-        .Skip((pageNumber - 1) * pageSize)
-        .Take(pageSize)
-        .Select(c => new CheepViewModel(
-            c.Author.Name,
-            c.Text,
-            c.TimeStamp.ToString("MM/dd/yy H:mm:ss"),
-            c.Author.Id,
-                c.CheepId,
-    _context.Likes.Count(l => l.LikedCheepId == c.CheepId)
-        ))
-        .ToList();
+    return cheeps.Select(c => new CheepDTO(
+        c.CheepId,
+        c.AuthorId,
+        c.Author != null ? c.Author.UserName : "Unknown",
+        c.Text,
+        c.TimeStamp,
+        _context.Likes.Count(l => l.LikedCheepId == c.CheepId)
+    )).ToList();
     }
 
    public async Task CreateCheep(string cheepText, Author author)
@@ -107,27 +113,28 @@ public class CheepRepository : ICheepRepository
         await _context.SaveChangesAsync();
     }
 
-public List<CheepViewModel> GetCheepsByLikes(int pageNumber = 1)
+public List<CheepDTO> GetCheepsByLikes(int pageNumber = 1)
 {
     int pageSize = 32;
-    
+    int offset = (pageNumber - 1) * pageSize;
+
     var cheeps = _context.Cheeps
         .Include(c => c.Author)
-        .Select(c => new CheepViewModel(
-            c.Author.Name,
-            c.Text,
-            c.TimeStamp.ToString(),
-            c.AuthorId,
+        .AsEnumerable()
+        .Select(c => new CheepDTO(
             c.CheepId,
+            c.AuthorId,
+            c.Author != null ? c.Author.UserName : "Unknown",
+            c.Text,
+            c.TimeStamp,
             _context.Likes.Count(l => l.LikedCheepId == c.CheepId)
         ))
-        .ToList();
-
-    return cheeps
         .OrderByDescending(c => c.LikeCount)
         .ThenByDescending(c => c.Timestamp)
-        .Skip((pageNumber - 1) * pageSize)
+        .Skip(offset)
         .Take(pageSize)
         .ToList();
+
+    return cheeps;
 }
 }

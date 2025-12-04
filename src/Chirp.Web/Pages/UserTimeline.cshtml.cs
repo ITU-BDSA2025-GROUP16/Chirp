@@ -32,6 +32,7 @@ public class UserTimelineModel : PageModel
     [BindProperty]
     public int CheepId { get; set; }
     
+    public string? CurrentUserDisplayName { get; set; }//To hide follow on your public page
 
     public UserTimelineModel(ICheepService service, IFollowService followService, ILikeService likeService, UserManager<Author> userManager)
     {
@@ -41,65 +42,46 @@ public class UserTimelineModel : PageModel
         _userManager = userManager;
     }
 
-    public async Task OnGetAsync()
+public async Task OnGetAsync()
+{
+    Author = RouteData.Values["author"]?.ToString();
+    int pageNumber = 1;
+    string? pageQuery = HttpContext.Request.Query["page"];
+    if (!string.IsNullOrEmpty(pageQuery) && int.TryParse(pageQuery, out int parsedPage))
     {
-        Author = RouteData.Values["author"]?.ToString();
-        int pageNumber = 1;
-        string? pageQuery = HttpContext.Request.Query["page"];
-        if (!string.IsNullOrEmpty(pageQuery) && int.TryParse(pageQuery, out int parsedPage))
-        {
-            pageNumber = parsedPage > 0 ? parsedPage : 1;
-        }
+        pageNumber = parsedPage > 0 ? parsedPage : 1;
+    }
 
-        CurrentPage = pageNumber;
+    CurrentPage = pageNumber;
 
-        if (string.IsNullOrEmpty(Author))
-        {
-            Cheeps = new();
-            return;
-        }
+    if (string.IsNullOrEmpty(Author))
+    {
+        Cheeps = new();
+        return;
+    }
 
-        Cheeps = _service.GetCheepsFromAuthor(Author, pageNumber);
-        
-        if (User.Identity?.IsAuthenticated == true)
+    Cheeps = _service.GetCheepsFromAuthor(Author, pageNumber);
+    
+    if (User.Identity?.IsAuthenticated == true)
+    {
+        var userIdString = _userManager.GetUserId(User);
+        if (!string.IsNullOrEmpty(userIdString))
         {
-            var userIdString = _userManager.GetUserId(User);
-            if (!string.IsNullOrEmpty(userIdString))
+            int currentUserId = int.Parse(userIdString);
+            
+            var currentUser = await _userManager.GetUserAsync(User);
+            CurrentUserDisplayName = currentUser?.Name;  // Use Name property, not UserName
+            
+            LikedCheepIds = await _likeService.GetLikedCheepIds(currentUserId);
+            
+            if (Cheeps.Any())
             {
-                int currentUserId = int.Parse(userIdString);
-                LikedCheepIds = await _likeService.GetLikedCheepIds(currentUserId);
-                
-                if (Cheeps.Any())
-                {
-                    AuthorId = Cheeps.First().AuthorId;
-                    IsFollowing = await _followService.IsFollowing(currentUserId, AuthorId.Value);
-                }
+                AuthorId = Cheeps.First().AuthorId;
+                IsFollowing = await _followService.IsFollowing(currentUserId, AuthorId.Value);
             }
         }
     }
-    
-    public async Task<IActionResult> OnPostAsync()
-    {
-        Console.WriteLine("=== OnPostAsync Called ===");
-        Author = RouteData.Values["author"]?.ToString();
-
-        if (string.IsNullOrEmpty(Author))
-        {
-            return Page();
-        }
-
-        var currentUser = await _userManager.GetUserAsync(User);
-
-        if (string.IsNullOrWhiteSpace(NewCheepText) || NewCheepText.Length > 160)
-        {
-            ModelState.AddModelError(string.Empty, "Cheep text must be between 1 and 160 characters.");
-            return Page();
-        }
-
-        await _service.CreateCheep(currentUser, NewCheepText);
-        Console.WriteLine("User:" + currentUser);
-        return Redirect("/");
-    }
+}
     
     public async Task<IActionResult> OnPostFollowAsync()
     {

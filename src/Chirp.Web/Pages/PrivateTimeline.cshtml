@@ -8,11 +8,11 @@
 @if (User.Identity.IsAuthenticated)
 {
     <div>
-        <h2>@User.Identity.Name's Timeline - Page @Model.CurrentPage</h2>
+        <h2>@Model.Author's Timeline - Page @Model.CurrentPage</h2>
         <p>This is your private timeline.</p>
 
         <div class="cheepbox">
-            <h3>What's on your mind @User.Identity.Name?</h3>
+            <h3>What's on your mind @Model.Author?</h3>
             <form method="post">
                 <input asp-for="NewCheepText" type="text">
                 <input type="submit" value="Share">
@@ -35,7 +35,7 @@
                                 <p style="margin: 4px 0 0 0;">@cheep.Message</p>
                             </div>
 
-                            @if (User.Identity?.Name != cheep.Author)
+                           @if (Model.Author != cheep.Author)
                             {
                                 <div style="display: flex; flex-direction: column; gap: 4px;">
                                     <form method="post" asp-page-handler="Follow" style="margin:0;">

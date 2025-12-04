@@ -7,6 +7,7 @@ using Chirp.Core.Domain;
 
 namespace Chirp.Web.Pages;
 
+[IgnoreAntiforgeryToken]
 public class PrivateTimelineModel : PageModel
 {
     private readonly ICheepService _service;
@@ -97,7 +98,7 @@ public class PrivateTimelineModel : PageModel
         }
 
         await _service.CreateCheep(currentUser, NewCheepText);
-        return Redirect("/private/{author}");
+        return Redirect($"/private/{Author}");
     }
 
 

@@ -14,12 +14,17 @@ public static class TestClientExtensions
     /// </summary>
     /// <param name="factory">The web application factory</param>
     /// <param name="username">The username to authenticate as (e.g., "TestUser")</param>
+    /// <param name="allowAutoRedirect">Whether the client should follow redirects automatically</param>
     /// <returns>An HttpClient with authentication headers set</returns>
     public static HttpClient CreateAuthenticatedClient(
         this WebApplicationFactory<Program> factory,
-        string username)
+        string username,
+        bool allowAutoRedirect = false)
     {
-        var client = factory.CreateClient();
+        var client = factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = allowAutoRedirect
+        });
 
         // Set the test authentication header
         client.DefaultRequestHeaders.Add("X-Test-User", username);

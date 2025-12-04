@@ -90,12 +90,12 @@ public class Tests
 		var cheeps = facade.GetCheeps();
 
 		DateTimeOffset dateTime = DateTimeOffset.FromUnixTimeSeconds(1690895598);
-		string formatted = dateTime.UtcDateTime.ToString("MM/dd/yy H:mm:ss");
 
 		Assert.Single(cheeps);
-		Assert.Equal("Roger Histand", cheeps[0].Author);
+		Assert.Equal("Roger Histand", cheeps[0].AuthorName);
 		Assert.Equal("You are here for at all?", cheeps[0].Message);
-		Assert.Equal(formatted, cheeps[0].Timestamp);
+		
+		Assert.Equal(dateTime.UtcDateTime, cheeps[0].Timestamp);
 	}
 
 

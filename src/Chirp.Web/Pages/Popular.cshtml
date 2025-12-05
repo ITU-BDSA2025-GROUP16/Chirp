@@ -24,7 +24,7 @@
                             <p style="margin: 4px 0 0 0;">@cheep.Message</p>
                         </div>
 
-                        @if (User.Identity?.IsAuthenticated == true && User.Identity?.Name != cheep.Author)
+                        @if (User.Identity?.IsAuthenticated == true && Model.Author != cheep.Author)
                         {
                             <div style="display: flex; flex-direction: column; gap: 4px;">
                                 <form method="post" asp-page-handler="Follow" style="margin:0;">

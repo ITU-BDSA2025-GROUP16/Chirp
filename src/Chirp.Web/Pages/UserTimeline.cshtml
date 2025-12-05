@@ -8,7 +8,7 @@
 <div>
     <h2>@Model.Author's Timeline - Page @Model.CurrentPage</h2>
     
-    @if (User.Identity?.IsAuthenticated == true && User.Identity?.Name != Model.Author && Model.AuthorId.HasValue)
+    @if (User.Identity?.IsAuthenticated == true && Model.CurrentUserDisplayName != Model.Author && Model.AuthorId.HasValue)
     {
         <form method="post" asp-page-handler="Follow" style="margin: 0 0 16px 0;">
             <input type="hidden" name="followedId" value="@Model.AuthorId" />
@@ -34,23 +34,23 @@
                             <p style="margin: 4px 0 0 0;">@cheep.Message</p>
                         </div>
 
-                        @if (User.Identity?.IsAuthenticated == true && User.Identity?.Name != cheep.Author)
-{
-    <div style="display: flex; flex-direction: column; gap: 4px;">
-        <form method="post" asp-page-handler="Follow" style="margin:0;">
-            <input type="hidden" name="followedId" value="@cheep.AuthorId" />
-            <button type="submit" style="width: 110px;">
-                @(Model.IsFollowing ? "Unfollow ❌" : "Follow 📌")
-            </button>
-        </form>
-        <form method="post" asp-page-handler="Like" style="margin:0;">
-            <input type="hidden" name="CheepId" value="@cheep.CheepId" />
-            <button type="submit" style="width: 110px;">
-                @(Model.LikedCheepIds.Contains(cheep.CheepId) ? "Unlike 👎" : "Like 👍")
-            </button>
-        </form>
-    </div>
-}
+                        @if (User.Identity?.IsAuthenticated == true && Model.CurrentUserDisplayName != cheep.Author)
+                        {
+                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                <form method="post" asp-page-handler="Follow" style="margin:0;">
+                                    <input type="hidden" name="followedId" value="@cheep.AuthorId" />
+                                    <button type="submit" style="width: 110px;">
+                                        @(Model.IsFollowing ? "Unfollow ❌" : "Follow 📌")
+                                    </button>
+                                </form>
+                                <form method="post" asp-page-handler="Like" style="margin:0;">
+                                    <input type="hidden" name="CheepId" value="@cheep.CheepId" />
+                                    <button type="submit" style="width: 110px;">
+                                        @(Model.LikedCheepIds.Contains(cheep.CheepId) ? "Unlike 👎" : "Like 👍")
+                                    </button>
+                                </form>
+                            </div>
+                        }
                     </div>
                 </li>
             }

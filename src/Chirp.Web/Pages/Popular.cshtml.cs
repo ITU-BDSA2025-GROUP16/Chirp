@@ -17,6 +17,7 @@ public class PopularModel : PageModel
     
     public List<CheepViewModel> Cheeps { get; set; } = new();
     public int CurrentPage { get; set; } = 1;
+    public string? Author { get; set; }
 
     public HashSet<int> FollowedAuthorIds { get; set; } = new();
     public HashSet<int> LikedCheepIds { get; set; } = new();
@@ -55,6 +56,9 @@ public class PopularModel : PageModel
                 int userId = int.Parse(userIdString);
                 FollowedAuthorIds = await _followService.GetFollowedIds(userId);
                 LikedCheepIds = await _likeService.GetLikedCheepIds(userId);
+                
+                var currentUser = await _userManager.GetUserAsync(User);
+                Author = currentUser?.Name;
             }
         }
     }

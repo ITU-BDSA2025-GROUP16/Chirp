@@ -65,6 +65,9 @@ public class PublicModel : PageModel
                 int userId = int.Parse(userIdString);
                 FollowedAuthorIds = await _serviceA.GetFollowedIds(userId);
                 LikedCheepIds = await _likeService.GetLikedCheepIds(userId);
+                
+                var currentUser = await _userManager.GetUserAsync(User);
+                Author = currentUser?.Name;
             }
         }
     }

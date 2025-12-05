@@ -45,38 +45,33 @@ public class PrivateTimelineModel : PageModel
     }
 
     public async Task OnGetAsync() 
+{
+    int pageNumber = 1;
+    string? pageQuery = HttpContext.Request.Query["page"];
+    if (!string.IsNullOrEmpty(pageQuery) && int.TryParse(pageQuery, out int parsedPage))
     {
-        Author = User.Identity?.Name;
-
-        int pageNumber = 1;
-        string? pageQuery = HttpContext.Request.Query["page"];
-        if (!string.IsNullOrEmpty(pageQuery) && int.TryParse(pageQuery, out int parsedPage))
-        {
-            pageNumber = parsedPage > 0 ? parsedPage : 1;
-        }
-
-        CurrentPage = pageNumber;
-
-        if (string.IsNullOrEmpty(Author))
-        {
-            Cheeps = new();
-            return;
-        }
-
-        var userIdString = _userManager.GetUserId(User);
-        if (string.IsNullOrEmpty(userIdString))
-        {
-            Cheeps = new();
-            return;
-        }
-
-        int userId = int.Parse(userIdString);
-        
-        FollowedAuthorIds = await _followService.GetFollowedIds(userId);
-        LikedCheepIds = await _likeService.GetLikedCheepIds(userId);
-        var authorIdsToShow = new List<int>(FollowedAuthorIds) { userId };
-        Cheeps = _service.GetCheepsFromFollowedAuthors(authorIdsToShow.ToList(), pageNumber);
+        pageNumber = parsedPage > 0 ? parsedPage : 1;
     }
+
+    CurrentPage = pageNumber;
+
+    var userIdString = _userManager.GetUserId(User);
+    if (string.IsNullOrEmpty(userIdString))
+    {
+        Cheeps = new();
+        return;
+    }
+
+    int userId = int.Parse(userIdString);
+    
+    FollowedAuthorIds = await _followService.GetFollowedIds(userId);
+    LikedCheepIds = await _likeService.GetLikedCheepIds(userId);
+    var authorIdsToShow = new List<int>(FollowedAuthorIds) { userId };
+    Cheeps = _service.GetCheepsFromFollowedAuthors(authorIdsToShow.ToList(), pageNumber);
+    
+    var currentUser = await _userManager.GetUserAsync(User);
+    Author = currentUser?.Name;
+}
     
     public async Task<IActionResult> OnPostAsync()
     {

@@ -69,15 +69,8 @@ public class PrivateTimelineModel : PageModel
     var authorIdsToShow = new List<int>(FollowedAuthorIds) { userId };
     Cheeps = _service.GetCheepsFromFollowedAuthors(authorIdsToShow.ToList(), pageNumber);
     
-    if (Cheeps.Any())
-    {
-        Author = Cheeps.FirstOrDefault (c => c.AuthorId == userId)?.Author 
-                 ?? User.Identity?.Name;
-    }
-    else
-    {
-        Author = User.Identity?.Name;
-    }
+    var currentUser = await _userManager.GetUserAsync(User);
+    Author = currentUser?.Name;
 }
     
     public async Task<IActionResult> OnPostAsync()

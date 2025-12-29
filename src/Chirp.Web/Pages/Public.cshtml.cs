@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Chirp.Web.Pages;
 
+[IgnoreAntiforgeryToken]
 public class PublicModel : PageModel
 {
     private readonly ICheepService _service;
@@ -69,7 +70,6 @@ public class PublicModel : PageModel
         }
     }
     
-    [IgnoreAntiforgeryToken]
     public IActionResult OnPostGitHubLogin()
     {
         Console.WriteLine("=== GitHub Login Handler Called ===");

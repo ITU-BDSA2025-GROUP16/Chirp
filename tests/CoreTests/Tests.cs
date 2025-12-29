@@ -18,7 +18,6 @@ public class Tests
 	[Fact]
 	public void UnitUserCreatingTest()
 	{
-		var userId = 12345;
 		var username = "Tester";
 		var email = "Tester@email.com";
 

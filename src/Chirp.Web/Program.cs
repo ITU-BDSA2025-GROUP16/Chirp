@@ -87,7 +87,11 @@ builder.Services.AddAuthentication()
                 {
                     return;
                 }
-                var userName = context.Principal.FindFirst(ClaimTypes.Name)?.Value;
+                var userName = context.Principal?.FindFirst(ClaimTypes.Name)?.Value;
+                if (string.IsNullOrEmpty(userName))
+                {
+                    return;
+                }
                 var email = context.Principal.FindFirst(ClaimTypes.Email)?.Value;
 
                 userName = string.IsNullOrWhiteSpace(userName) ? $"GitHubUser_{gitHubId}" : userName.Trim();

@@ -34,7 +34,7 @@ public class PrivateTimelineModel : PageModel
     public int AuthorId { get; set; }
 
     [BindProperty]
-    public string Timestamp { get; set; }
+    public required string Timestamp { get; set; }
 
     public PrivateTimelineModel(ICheepService service, IFollowService followService, ILikeService likeService, UserManager<Author> userManager) 
     {

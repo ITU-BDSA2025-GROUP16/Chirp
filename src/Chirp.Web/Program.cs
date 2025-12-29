@@ -80,24 +80,23 @@ builder.Services.AddAuthentication()
         
         options.Events = new OAuthEvents
         {
-            OnCreatingTicket = async context =>
+            OnCreatingTicket = context =>
             {
                 var gitHubId = context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (gitHubId == null)
-                {
-                    return;
-                }
-                var userName = context.Principal?.FindFirst(ClaimTypes.Name)?.Value;
-                if (string.IsNullOrEmpty(userName))
-                {
-                    return;
-                }
-                var email = context.Principal.FindFirst(ClaimTypes.Email)?.Value;
+                if (string.IsNullOrWhiteSpace(gitHubId)) return Task.CompletedTask;
 
-                userName = string.IsNullOrWhiteSpace(userName) ? $"GitHubUser_{gitHubId}" : userName.Trim();
-                email = string.IsNullOrWhiteSpace(email) ? $"{userName}@github.user" : email.Trim();
+                var userName = context.Principal?.FindFirst(ClaimTypes.Name)?.Value;
+                if (string.IsNullOrWhiteSpace(userName)) return Task.CompletedTask;
+
+                var email = context.Principal?.FindFirst(ClaimTypes.Email)?.Value;
+                if (string.IsNullOrWhiteSpace(email)) return Task.CompletedTask;
+
+                userName = userName.Trim();
+                email = email.Trim();
 
                 Console.WriteLine($"=== GitHub OAuth - User: {userName} (ID: {gitHubId}) ===");
+
+                return Task.CompletedTask; // return Task explicitly
             },
             
             OnRemoteFailure = context =>

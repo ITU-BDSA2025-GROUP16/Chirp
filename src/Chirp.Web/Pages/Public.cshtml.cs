@@ -16,8 +16,6 @@ public class PublicModel : PageModel
     private readonly ILikeService _likeService;
 
     private readonly UserManager<Author> _userManager;
-    private Author? _currentUser;
-    
     public string? Author { get; set; } = string.Empty;
     public List<CheepViewModel> Cheeps { get; set; } = new();
     public int CurrentPage { get; set; } = 1;

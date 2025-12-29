@@ -131,8 +131,9 @@ public class PrivateTimelineModel : PageModel
 
     public async Task<IActionResult> OnPostLikeAsync()
     {
-        if (!User.Identity.IsAuthenticated)
+        if (!(User?.Identity?.IsAuthenticated ?? false))
             return Forbid();
+
 
         var userIdString = _userManager.GetUserId(User);
         if (string.IsNullOrEmpty(userIdString))

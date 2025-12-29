@@ -88,7 +88,7 @@ public class PopularModel : PageModel
 
     public async Task<IActionResult> OnPostLikeAsync()
     {
-        if (!User.Identity.IsAuthenticated)
+        if (User == null || User.Identity == null || !User.Identity.IsAuthenticated)
             return Forbid();
 
         var userIdString = _userManager.GetUserId(User);

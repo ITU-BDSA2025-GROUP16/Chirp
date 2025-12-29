@@ -117,8 +117,9 @@ public async Task OnGetAsync()
 
     public async Task<IActionResult> OnPostLikeAsync()
     {
-        if (!User.Identity.IsAuthenticated)
+        if (!(User?.Identity?.IsAuthenticated ?? false))
             return Forbid();
+
 
         Author = RouteData.Values["author"]?.ToString();
 

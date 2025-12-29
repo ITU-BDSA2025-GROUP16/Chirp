@@ -82,7 +82,11 @@ builder.Services.AddAuthentication()
         {
             OnCreatingTicket = async context =>
             {
-                var gitHubId = context.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var gitHubId = context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (gitHubId == null)
+                {
+                    return;
+                }
                 var userName = context.Principal.FindFirst(ClaimTypes.Name)?.Value;
                 var email = context.Principal.FindFirst(ClaimTypes.Email)?.Value;
 

@@ -34,8 +34,7 @@ public class PublicModel : PageModel
     [BindProperty]
     public int AuthorId { get; set; }
 
-    [BindProperty]
-    public string Timestamp { get; set; }
+    [BindProperty] public string Timestamp { get; set; } = string.Empty;
     
     public PublicModel(ICheepService service, IFollowService serviceA, ILikeService likeService, UserManager<Author> userManager)
     {

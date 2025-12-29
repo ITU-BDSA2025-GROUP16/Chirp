@@ -11,62 +11,166 @@ numbersections: true
 
 ## Domain model
 
-Here comes a description of our domain model.
+![domain-model](https://hackmd.io/_uploads/BkHKww37Wx.png)
 
-Provide an illustration of your domain model. Make sure that it is correct and complete. In case you are using ASP.NET Identity, make sure to illustrate that accordingly.
 
-![Illustration of the _Chirp!_ data model as UML class diagram.](docs/images/domain_model.png)
+## Architecture — In the small - Sam 
 
-## Architecture — In the small
+![Onion Architecture ](https://hackmd.io/_uploads/HkCBVVxEZe.png)
+Each layer of the onion architecture is represented by a .NET project or a .NET test project. Within each project, there may be additional folders or subfolders that can only reference or implicitly use other projects. Each layer in the architecture depends on the inner projects.
 
-Illustrate the organization of your code base. That is, illustrate which layers exist in your (onion) architecture. Make sure to illustrate which part of your code is residing in which layer.
+## Architecture of deployed application - Victor 
 
-## Architecture of deployed application'
+![TP4_Ry8m4CLtI_uEHxg0AihUeIAOz0zAASIHkdHnuYkr59p8JahLgj-zjWc4fHuiw_oxzzxPSziAqtRxYX9HLVLXhxwKtb52oKZYkz88MSBoUFsG9b1Mmbf_fMk94B5AeMvXYP-gn3SzViK25gO-M3IJ28HrV01-A06t1fs8VIZJZC0tn4tZMZCKPGlNiE9kUyoVqndZ_5B4OPJy3jxnTs](https://hackmd.io/_uploads/S1LS5wgN-x.svg)
 
-Illustrate the architecture of your deployed application. Remember, you developed a client-server application. Illustrate the server component and to where it is deployed, illustrate a client component, and show how these communicate with each other.
+The Chirp! web app runs in a browser as the client, sending HTTPS requests to the .NET server deployed on Azure App Service. The server handles business logic, processes requests, and interacts with the Azure SQL Database to store and retrieve persistent data such as users, posts, and follows.
 
-## User activities
 
-Illustrate typical scenarios of a user journey through your Chirp! application. That is, start illustrating the first page that is presented to a non-authorized user, illustrate what a non-authorized user can do with your Chirp! application, and finally illustrate what a user can do after authentication.
 
-Make sure that the illustrations are in line with the actual behavior of your application.
+## User activities - Aksel
 
-## Sequence of functionality/calls trough _Chirp!_
 
-With a UML sequence diagram, illustrate the flow of messages and data through your Chirp! application. Start with an HTTP request that is send by an unauthorized user to the root endpoint of your application and end with the completely rendered web-page that is returned to the user.
+The first diagram below illustrates the options available to a non-authenticated user, starting from the public page.
 
-Make sure that your illustration is complete. That is, likely for many of you there will be different kinds of "calls" and responses. Some HTTP calls and responses, some calls and responses in C# and likely some more. (Note the previous sentence is vague on purpose. I want that you create a complete illustration.)
+The second diagram illustrates the options available to users who have been authenticated.
+
+For clarity, Activities have been colored either blue or green. Blue represents states/displays of the application. Green represents buttons/actions available to the user, such as _"click: public page"_ <br>
+The following and like features are available across multiple pages in the application. However, due to the fact that the flow of those features is the same regardless of where they are performed, they are only represented once in the diagram.
+
+<center>
+
+![NonAuthenticatedUser](https://hackmd.io/_uploads/r1gIN8gE-g.png)
+
+_Figure 3: Non-authenticated user activities_
+
+</center>
+    
+<center>
+    
+![AuthenticatedUser](https://hackmd.io/_uploads/HkpUEUe4-g.png)
+
+_Figure 4: Authenticated user activities_
+
+</center>
+    
+## Sequence of functionality/calls trough _Chirp!_ - Torkil
+
+The following sequence diagram illustrates the request flow when a client accesses the public page of the application. It shows how an HTTP request is processed through the web layer, page model, application services, infrastructure, and database, and how data is returned and rendered as an HTML response.
+
+![SequenceDiagram](https://hackmd.io/_uploads/HkhPzVxVbg.png)
+
+
+
 
 # Process
 
-## Build, test, release, and deployment
+## Build, test, release, and deployment - Victor
 
-Illustrate with a UML activity diagram how your Chirp! applications are build, tested, released, and deployed. That is, illustrate the flow of activities in your respective GitHub Actions workflows.
+### Build & Test Diagram 
 
-Describe the illustration briefly, i.e., how your application is built, tested, released, and deployed.
+![Swimlane buildandtest](https://hackmd.io/_uploads/Hy1OEvlNZl.jpg)
 
-## Team work
+This activity diagram illustrates the continuous integration workflow for the Chirp! application. When a developer pushes changes or opens a pull request on the main branch, GitHub triggers a CI workflow. The workflow checks out the repository, sets up the .NET environment, restores dependencies, builds the solution, and runs both core and API tests. The process includes a decision point where the workflow either fails if any test fails or completes successfully if all tests pass.
+
+
+### Build & Deploy to Azure
+
+![azure diagram](https://hackmd.io/_uploads/B1XKEvlEbg.jpg)
+
+This activity diagram shows the continuous deployment workflow for Chirp!. When a developer pushes changes to the main branch, GitHub triggers a deployment workflow. The application is built and published using GitHub Actions, and the resulting artifact is uploaded and passed to a deployment job. The workflow then authenticates with Azure and deploys the application to the production slot of an Azure Web App. Once deployed, the updated application is running in the production environment.
+
+
+### Release Workflow
+![releasediagram](https://hackmd.io/_uploads/SJ2YVwxE-x.jpg)
+
+This activity diagram describes the release workflow for Chirp!, which is triggered when a version tag is pushed to the repository. The workflow builds and publishes the application for multiple operating systems in parallel, including Linux, Windows, and macOS. Each build is packaged as a ZIP artifact and uploaded. After all builds complete, a GitHub Release is created, the artifacts are attached, and release notes are generated automatically. The final result is a published versioned release available for download.
+
+## Team work - Torkil
 
 Show a screenshot of your project board right before hand-in. Briefly describe which tasks are still unresolved, i.e., which features are missing from your applications or which functionality is incomplete.
 
 Briefly describe and illustrate the flow of activities that happen from the new creation of an issue (task description), over development, etc. until a feature is finally merged into the main branch of your repository.
 
-## How to make _Chirp!_ work locally
 
-There has to be some documentation on how to come from cloning your project to a running system. That is, Adrian or Helge have to know precisely what to do in which order. Likely, it is best to describe how we clone your project, which commands we have to execute, and what we are supposed to see then.
+An issue would be created from the requirements given in the course. It would then be added to our Git to-do list. From there we would assign issues to different group members. Mostly just one person per issue. When a task is completed a pull request is made, and from there another group member reviews the work, and decides if it is acceptable. If it is, the branch is merged into the main branch, and if it is not acceptable, the reviewer tells the group member what is wrong and what has to be changed. From there the group member has to make a pull request again, when the task is complete.
 
-## How to run test suite locally
 
-List all necessary steps that Adrian or Helge have to perform to execute your test suites. Here, you can assume that we already cloned your repository in the step above.
+![Screenshot 2025-12-29 182901](https://hackmd.io/_uploads/Skcjq4gEZe.png)
 
-Briefly describe what kinds of tests you have in your test suites and what they are testing.
 
-# Ethics
+
+## How to make _Chirp!_ work locally - Aksel
+
+Make sure you have the following downloaded: <br>
+[.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+
+
+To run _Chirp!_: <br> 
+1\. Clone the repository to your directory of choice
+    
+```
+git clone https://github.com/ITU-BDSA2025-GROUP16/Chirp.git
+``` 
+    
+2\. Set up user-secrets _(required for Github OAuth login)_ <br>
+2.1. Access your [github developer settings](https://github.com/settings/developers) <br>
+2.2. Click **New OAuth App** <br>
+2.3. Fill in the following: 
+
+**Application name:** Chirp Local <br>
+**Homepage URL:** http://localhost:5696 <br>
+**Authorization callback URL:** http://localhost:5696/signin-github <br>
+
+2.4. Click **Update application** <br>
+2.5. Copy your _Client ID_, and generate a _Client secret_ <br>
+2.6. Finally, set your secrets:
+
+    cd src/Chirp.Web
+    dotnet user-secrets set "authentication:github:clientId" "<your-client-id>"
+    dotnet user-secrets set "authentication:github:clientSecret" "<your-client-secret>"
+
+3\. While still in the chirp.web directory, run the project
+```
+dotnet run
+``` 
+
+4\. The web application can be accessed on http://localhost:5696 in a browser. 
+You should see the _Chirp!_ public page here. 
+
+
+
+## How to run test suite locally - Aksel
+
+The project has 3 seperate test suites: 
+* ApiTests 
+* Chirp.Web.Tests 
+* CoreTests
+
+From the root, first
+```
+dotnet restore
+dotnet build
+```
+Then access your desuired test suite, e.g.
+```
+cd tests/ApiTests
+```
+Then run the tests inside it
+```
+dotnet test
+```
+The suites contain unit tests, integration tests, and E2E tests.  <br>
+With these, the system's core components (pages, repositories, services, etc.) are tested both individually and when working together. <br>
+The E2E tests target two specific user flows: liking cheeps and following users. 
+
+
+# Ethics - sam
 
 ## License
 
-State which software license you chose for your application.
+Chirp is licensed under MIT.
 
 ## LLMs, ChatGPT, CoPilot, and others
 
-State which LLM(s) were used during development of your project. In case you were not using any, just state so. In case you were using an LLM to support your development, briefly describe when and how it was applied. Reflect in writing to which degree the responses of the LLM were helpful. Discuss briefly if application of LLMs sped up your development or if the contrary was the case.
+As large language models (LLMs) have become increasingly integrated into the creative process, we have naturally turned to them for inspiration and guidance regarding assignment requirements. Our group has prioritized transparency by consistently co-authoring with LLMs whenever they are utilized. Generally, we have used LLMs not for coding purposes but as sources of inspiration and as a collaborative partner. 
+

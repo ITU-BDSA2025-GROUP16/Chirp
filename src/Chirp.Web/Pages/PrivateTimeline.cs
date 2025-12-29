@@ -90,7 +90,10 @@ public class PrivateTimelineModel : PageModel
             ModelState.AddModelError(string.Empty, "Cheep text must be between 1 and 160 characters.");
             return Page();
         }
-
+        
+        if (currentUser == null)
+            return Forbid();
+        
         await _service.CreateCheep(currentUser, NewCheepText);
         return Redirect("/private/{author}");
     }

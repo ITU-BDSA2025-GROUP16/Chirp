@@ -204,12 +204,13 @@ public class Tests
 		var longText = new string('a', 161);
 
 		// Act
-		cheepService.CreateCheep(longText, author);
+		cheepService.CreateCheep(author, longText);
 
 		// Assert
 		var cheepsInDb = context.Cheeps.ToList();
 		Assert.Empty(cheepsInDb);
 	}
+
 
 	
 	

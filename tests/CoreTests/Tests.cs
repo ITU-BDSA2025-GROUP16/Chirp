@@ -18,7 +18,6 @@ public class Tests
 	[Fact]
 	public void UnitUserCreatingTest()
 	{
-		var userId = 12345;
 		var username = "Tester";
 		var email = "Tester@email.com";
 
@@ -176,6 +175,46 @@ public class Tests
     	Assert.Equal("This is a test!", cheep.Text);
     	Assert.Equal(author.Name, cheep.Author.Name);
 	}
+	
+	[Fact]
+	public void CreateCheep_WithMoreThan160Characters_IsNotStored()
+	{
+		// Arrange
+		var options = new DbContextOptionsBuilder<ChatDBContext>()
+			.UseSqlite("Data Source=:memory:")
+			.Options;
+
+		using var context = new ChatDBContext(options);
+		context.Database.OpenConnection();
+		context.Database.EnsureCreated();
+
+		var author = new Author
+		{
+			Name = "LongCheepUser",
+			Email = "long@cheep.com"
+		};
+		context.Authors.Add(author);
+		context.SaveChanges();
+
+		var cheepRepo = new CheepRepository(context);
+		var cheepService = new CheepService(cheepRepo);
+
+		// Create a cheep with 161 characters
+		var longText = new string('a', 161);
+
+		// Act
+		cheepService.CreateCheep(author, longText);
+
+		// Assert
+		var cheepsInDb = context.Cheeps.ToList();
+		Assert.Empty(cheepsInDb);
+	}
+
+
+	
+	
+	
+	
 	[Fact]
 	public void IntegrationMessageByUserDataBaseTest()
 	{

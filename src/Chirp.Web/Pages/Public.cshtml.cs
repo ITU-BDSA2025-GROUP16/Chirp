@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Chirp.Web.Pages;
 
+[IgnoreAntiforgeryToken]
 public class PublicModel : PageModel
 {
     private readonly ICheepService _service;
@@ -16,8 +17,6 @@ public class PublicModel : PageModel
     private readonly ILikeService _likeService;
 
     private readonly UserManager<Author> _userManager;
-    private Author? _currentUser;
-    
     public string? Author { get; set; } = string.Empty;
     public List<CheepViewModel> Cheeps { get; set; } = new();
     public int CurrentPage { get; set; } = 1;
@@ -34,8 +33,7 @@ public class PublicModel : PageModel
     [BindProperty]
     public int AuthorId { get; set; }
 
-    [BindProperty]
-    public string Timestamp { get; set; }
+    [BindProperty] public string Timestamp { get; set; } = string.Empty;
     
     public PublicModel(ICheepService service, IFollowService serviceA, ILikeService likeService, UserManager<Author> userManager)
     {
@@ -72,7 +70,6 @@ public class PublicModel : PageModel
         }
     }
     
-    [IgnoreAntiforgeryToken]
     public IActionResult OnPostGitHubLogin()
     {
         Console.WriteLine("=== GitHub Login Handler Called ===");
@@ -137,7 +134,7 @@ public class PublicModel : PageModel
 
     public async Task<IActionResult> OnPostLikeAsync()
     {
-        if (!User.Identity.IsAuthenticated)
+        if (!(User?.Identity?.IsAuthenticated ?? false))
             return Forbid();
 
         var userIdString = _userManager.GetUserId(User);

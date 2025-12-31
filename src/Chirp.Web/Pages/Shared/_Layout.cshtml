@@ -16,16 +16,19 @@
         <div class=navigation>
         @{
             string displayName = "";
-            if (User.Identity.IsAuthenticated)
+            if (User?.Identity?.IsAuthenticated ?? false)
             {
                 var user = await UserManager.GetUserAsync(User);
                 // Try Name first, then UserName, then fall back to Identity.Name
-                displayName = user?.Name ?? user?.UserName ?? User.Identity.Name;
+                displayName = user?.Name 
+                              ?? user?.UserName 
+                              ?? User?.Identity?.Name 
+                              ?? "Unknown"; // fallback if everything is null
             }
 
         }
 
-        @if (User.Identity.IsAuthenticated)
+        @if (User?.Identity?.IsAuthenticated ?? false)
 {
     <div>
         <a href="/private/@(displayName)">my timeline</a> |

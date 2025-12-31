@@ -31,6 +31,9 @@ public class CheepService : ICheepService
 
     public async Task CreateCheep(Author author, string text)
     {
+        // Reject cheeps longer than 160 characters
+        if (text.Length > 160)
+            return;
         await _repo.CreateCheep(text, author);
     }
 

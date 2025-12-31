@@ -34,7 +34,7 @@ public class PrivateTimelineModel : PageModel
     public int AuthorId { get; set; }
 
     [BindProperty]
-    public string Timestamp { get; set; }
+    public required string Timestamp { get; set; }
 
     public PrivateTimelineModel(ICheepService service, IFollowService followService, ILikeService likeService, UserManager<Author> userManager) 
     {
@@ -90,7 +90,10 @@ public class PrivateTimelineModel : PageModel
             ModelState.AddModelError(string.Empty, "Cheep text must be between 1 and 160 characters.");
             return Page();
         }
-
+        
+        if (currentUser == null)
+            return Forbid();
+        
         await _service.CreateCheep(currentUser, NewCheepText);
         return Redirect("/private/{author}");
     }
@@ -128,8 +131,9 @@ public class PrivateTimelineModel : PageModel
 
     public async Task<IActionResult> OnPostLikeAsync()
     {
-        if (!User.Identity.IsAuthenticated)
+        if (!(User?.Identity?.IsAuthenticated ?? false))
             return Forbid();
+
 
         var userIdString = _userManager.GetUserId(User);
         if (string.IsNullOrEmpty(userIdString))

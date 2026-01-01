@@ -11,8 +11,7 @@ numbersections: true
 
 ## Domain model
 
-![domain-model](https://hackmd.io/_uploads/BkHKww37Wx.png)
-
+<img width="1138" height="625" alt="billede" src="https://github.com/user-attachments/assets/3065ae5e-a76d-455c-80aa-5abcb74a069d" />
 
 ## Architecture — In the small - Sam 
 

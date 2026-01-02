@@ -1,9 +1,12 @@
 ---
 title: _Chirp!_ Project Report
-subtitle: ITU BDSA 2025 Group `<no>`
+subtitle: ITU BDSA 2025 Group `16`
 author:
-- "Helge Pfeiffer <ropf@itu.dk>"
-- "Adrian Hoff <adho@itu.dk>"
+- "Aksel Emil Dyhr <akdy@itu.dk>"
+- "Samuel Madsen <slma@itu.dk>"
+- "Victor Svendsen <Visv@itu.dk>"
+- "Torkil á Torkilsheyggi <toat@itu.dk>"
+- "Sune hesselberg <shes@itu.dk>"
 numbersections: true
 ---
 
@@ -11,22 +14,50 @@ numbersections: true
 
 ## Domain model
 
-<img width="1138" height="625" alt="billede" src="https://github.com/user-attachments/assets/3065ae5e-a76d-455c-80aa-5abcb74a069d" />
+The following is the domain model diagram of the _Chrip!_ project. The project centers around four main entities for which repositories and services exist: cheeps, authors, follows, and likes. 
 
-## Architecture — In the small - Sam 
+<center> 
 
+![531344538-3065ae5e-a76d-455c-80aa-5abcb74a069d](https://hackmd.io/_uploads/BJSS-XHVZg.png)
+
+_Figure 1: Domain model_
+
+</center>
+    
+
+
+## Architecture — In the small 
+
+<center>
+    
 ![Onion Architecture ](https://hackmd.io/_uploads/HkCBVVxEZe.png)
+    
+_Figure 2: Onion architecture_  
+    
+</center>
+    
 Each layer of the onion architecture is represented by a .NET project or a .NET test project. Within each project, there may be additional folders or subfolders that can only reference or implicitly use other projects. Each layer in the architecture depends on the inner projects.
+    
+</center>
+    
+## Architecture of deployed application 
 
-## Architecture of deployed application - Victor 
+<center>
+    
+![TP4_JyCm4CLtI_uErx2qGgKx0sfmpP-g2cqTYQMBKnzWoNKYEw48n7V7Dg7fWYVx_BltdkxclfMkxGw64cbCVJpe3srVAQ5afF15MuGjPsLUtAyux8tqFdxPMY5ap6YqBIpmNUznPyVFMC6jguyUtIG3wGEVW2zA89n19sDlsZKZY0rvqvonuKN9zs2HVtOE8mC2NMzpLV0Is4Mg_3dvTF](https://hackmd.io/_uploads/SywtBXrNbl.png)
 
-![TP4_Ry8m4CLtI_uEHxg0AihUeIAOz0zAASIHkdHnuYkr59p8JahLgj-zjWc4fHuiw_oxzzxPSziAqtRxYX9HLVLXhxwKtb52oKZYkz88MSBoUFsG9b1Mmbf_fMk94B5AeMvXYP-gn3SzViK25gO-M3IJ28HrV01-A06t1fs8VIZJZC0tn4tZMZCKPGlNiE9kUyoVqndZ_5B4OPJy3jxnTs](https://hackmd.io/_uploads/S1LS5wgN-x.svg)
 
+
+_Figure 3: Architecture of deployed application_
+
+
+</center>
+    
 The Chirp! web app runs in a browser as the client, sending HTTPS requests to the .NET server deployed on Azure App Service. The server handles business logic, processes requests, and interacts with the Azure SQL Database to store and retrieve persistent data such as users, posts, and follows.
 
 
 
-## User activities - Aksel
+## User activities 
 
 
 The first diagram below illustrates the options available to a non-authenticated user, starting from the public page.
@@ -39,8 +70,8 @@ The following and like features are available across multiple pages in the appli
 <center>
 
 ![NonAuthenticatedUser](https://hackmd.io/_uploads/r1gIN8gE-g.png)
-
-_Figure 3: Non-authenticated user activities_
+    
+_Figure 4: Non-authenticated user activities_
 
 </center>
     
@@ -48,57 +79,91 @@ _Figure 3: Non-authenticated user activities_
     
 ![AuthenticatedUser](https://hackmd.io/_uploads/HkpUEUe4-g.png)
 
-_Figure 4: Authenticated user activities_
+_Figure 5: Authenticated user activities_
 
 </center>
     
-## Sequence of functionality/calls trough _Chirp!_ - Torkil
+## Sequence of functionality/calls trough _Chirp!_
 
 The following sequence diagram illustrates the request flow when a client accesses the public page of the application. It shows how an HTTP request is processed through the web layer, page model, application services, infrastructure, and database, and how data is returned and rendered as an HTML response.
 
+<center>
+
 ![SequenceDiagram](https://hackmd.io/_uploads/HkhPzVxVbg.png)
 
+_Figure 6: Sequence of functionality_
 
+</center>
 
 
 # Process
 
-## Build, test, release, and deployment - Victor
+## Build, test, release, and deployment
 
 ### Build & Test Diagram 
 
+<center>
+    
 ![Swimlane buildandtest](https://hackmd.io/_uploads/Hy1OEvlNZl.jpg)
 
+_Figure 7: Build & test diagram_
+
+</center>
+    
 This activity diagram illustrates the continuous integration workflow for the Chirp! application. When a developer pushes changes or opens a pull request on the main branch, GitHub triggers a CI workflow. The workflow checks out the repository, sets up the .NET environment, restores dependencies, builds the solution, and runs both core and API tests. The process includes a decision point where the workflow either fails if any test fails or completes successfully if all tests pass.
 
 
 ### Build & Deploy to Azure
 
+<center>
+    
 ![azure diagram](https://hackmd.io/_uploads/B1XKEvlEbg.jpg)
+
+_Figure 8: Build & Deploy to Azure_
+
+</center>
 
 This activity diagram shows the continuous deployment workflow for Chirp!. When a developer pushes changes to the main branch, GitHub triggers a deployment workflow. The application is built and published using GitHub Actions, and the resulting artifact is uploaded and passed to a deployment job. The workflow then authenticates with Azure and deploys the application to the production slot of an Azure Web App. Once deployed, the updated application is running in the production environment.
 
 
 ### Release Workflow
+    
+<center>
+        
 ![releasediagram](https://hackmd.io/_uploads/SJ2YVwxE-x.jpg)
 
+_Figure 9: Release Workflow_
+
+</center>
+        
 This activity diagram describes the release workflow for Chirp!, which is triggered when a version tag is pushed to the repository. The workflow builds and publishes the application for multiple operating systems in parallel, including Linux, Windows, and macOS. Each build is packaged as a ZIP artifact and uploaded. After all builds complete, a GitHub Release is created, the artifacts are attached, and release notes are generated automatically. The final result is a published versioned release available for download.
 
-## Team work - Torkil
+## Team work
 
-Show a screenshot of your project board right before hand-in. Briefly describe which tasks are still unresolved, i.e., which features are missing from your applications or which functionality is incomplete.
+Tasks or functionalities that are incomplete: <br>
+Some of our tests are old, and although they are not redundant, they could be modernized to better reflect the current state of the project. Additionally, some parts of our program lack test coverage.
 
-Briefly describe and illustrate the flow of activities that happen from the new creation of an issue (task description), over development, etc. until a feature is finally merged into the main branch of your repository.
+
+<center>
+
+![Screenshot 2026-01-01 174415](https://hackmd.io/_uploads/rJlPmNNNWg.png)
+
+_Figure 10: Git projectboard_
+
+</center>
 
 
 An issue would be created from the requirements given in the course. It would then be added to our Git to-do list. From there we would assign issues to different group members. Mostly just one person per issue. When a task is completed a pull request is made, and from there another group member reviews the work, and decides if it is acceptable. If it is, the branch is merged into the main branch, and if it is not acceptable, the reviewer tells the group member what is wrong and what has to be changed. From there the group member has to make a pull request again, when the task is complete.
 
+<center>
 
 ![Screenshot 2025-12-29 182901](https://hackmd.io/_uploads/Skcjq4gEZe.png)
 
+_Figure 11: Git teamwork diagram_
 
+</center>
 
-## How to make _Chirp!_ work locally - Aksel
+## How to make _Chirp!_ work locally 
 
 Make sure you have the following downloaded: <br>
 [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
@@ -138,7 +203,7 @@ You should see the _Chirp!_ public page here.
 
 
 
-## How to run test suite locally - Aksel
+## How to run test suite locally
 
 The project has 3 seperate test suites: 
 * ApiTests 
@@ -163,7 +228,7 @@ With these, the system's core components (pages, repositories, services, etc.) a
 The E2E tests target two specific user flows: liking cheeps and following users. 
 
 
-# Ethics - sam
+# Ethics
 
 ## License
 

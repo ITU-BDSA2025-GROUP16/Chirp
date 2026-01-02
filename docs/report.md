@@ -44,7 +44,7 @@ Each layer of the onion architecture is represented by a .NET project or a .NET 
 
 <center>
     
-![TP4_JyCm4CLtI_uErx2qGgKx0sfmpP-g2cqTYQMBKnzWoNKYEw48n7V7Dg7fWYVx_BltdkxclfMkxGw64cbCVJpe3srVAQ5afF15MuGjPsLUtAyux8tqFdxPMY5ap6YqBIpmNUznPyVFMC6jguyUtIG3wGEVW2zA89n19sDlsZKZY0rvqvonuKN9zs2HVtOE8mC2NMzpLV0Is4Mg_3dvTF](https://hackmd.io/_uploads/SywtBXrNbl.png)
+![Architecture of deployed application](https://hackmd.io/_uploads/SywtBXrNbl.png)
 
 
 

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project Author="Claude" DocumentType="VP-UML" Xml_structure="simple" CommentTableSortAscending="false" ExporterVersion="16.3" Name="Git Workflow" UmlVersion="2.x" ProjectType="OOProject" TextualAnalysisHighlightOptionCaseSensitive="false">
+  <Models>
+    <FlowchartDiagram Id="flowchart_1" Name="Git Workflow Process">
+      <Shapes>
+        <!-- Start Terminal -->
+        <FlowchartTerminal Id="start_1" Name="Start" X="200" Y="30" Width="80" Height="40">
+          <Description>Start</Description>
+        </FlowchartTerminal>
+        
+        <!-- Process: Requirement read from Git -->
+        <FlowchartProcess Id="process_1" Name="Requirement read from Git" X="150" Y="100" Width="180" Height="50">
+          <Description>Requirement read from Git</Description>
+        </FlowchartProcess>
+        
+        <!-- Process: Task added to our to-do list -->
+        <FlowchartProcess Id="process_2" Name="Task added to our to-do list" X="150" Y="180" Width="180" Height="50">
+          <Description>Task added to our to-do list</Description>
+        </FlowchartProcess>
+        
+        <!-- Process: Task assigned to a group member -->
+        <FlowchartProcess Id="process_3" Name="Task assigned to a group member" X="150" Y="260" Width="180" Height="50">
+          <Description>Task assigned to a group member</Description>
+        </FlowchartProcess>
+        
+        <!-- Process: Task is completed -->
+        <FlowchartProcess Id="process_4" Name="Task is completed" X="150" Y="340" Width="180" Height="50">
+          <Description>Task is completed</Description>
+        </FlowchartProcess>
+        
+        <!-- Process: Pull request is made -->
+        <FlowchartProcess Id="process_5" Name="Pull request is made" X="150" Y="420" Width="180" Height="50">
+          <Description>Pull request is made</Description>
+        </FlowchartProcess>
+        
+        <!-- Process: Another group member reviews -->
+        <FlowchartProcess Id="process_6" Name="Another group member reviews" X="150" Y="500" Width="180" Height="50">
+          <Description>Another group member reviews</Description>
+        </FlowchartProcess>
+        
+        <!-- Decision: Work approved? -->
+        <FlowchartDecision Id="decision_1" Name="Work approved?" X="190" Y="580" Width="100" Height="80">
+          <Description>Work approved?</Description>
+        </FlowchartDecision>
+        
+        <!-- Process: Merge into main -->
+        <FlowchartProcess Id="process_7" Name="Merge into main" X="50" Y="700" Width="140" Height="50">
+          <Description>Merge into main</Description>
+        </FlowchartProcess>
+        
+        <!-- Process: Redo the work with feedback -->
+        <FlowchartProcess Id="process_8" Name="Redo the work with feedback" X="290" Y="700" Width="180" Height="50">
+          <Description>Redo the work with feedback</Description>
+        </FlowchartProcess>
+        
+        <!-- End Terminal -->
+        <FlowchartTerminal Id="end_1" Name="End" X="80" Y="790" Width="80" Height="40">
+          <Description>End</Description>
+        </FlowchartTerminal>
+      </Shapes>
+      
+      <Connectors>
+        <!-- Start to Requirement read from Git -->
+        <FlowchartFlow Id="flow_1" From="start_1" To="process_1"/>
+        
+        <!-- Requirement read from Git to Task added to our to-do list -->
+        <FlowchartFlow Id="flow_2" From="process_1" To="process_2"/>
+        
+        <!-- Task added to our to-do list to Task assigned to a group member -->
+        <FlowchartFlow Id="flow_3" From="process_2" To="process_3"/>
+        
+        <!-- Task assigned to a group member to Task is completed -->
+        <FlowchartFlow Id="flow_4" From="process_3" To="process_4"/>
+        
+        <!-- Task is completed to Pull request is made -->
+        <FlowchartFlow Id="flow_5" From="process_4" To="process_5"/>
+        
+        <!-- Pull request is made to Another group member reviews -->
+        <FlowchartFlow Id="flow_6" From="process_5" To="process_6"/>
+        
+        <!-- Another group member reviews to Work approved? -->
+        <FlowchartFlow Id="flow_7" From="process_6" To="decision_1"/>
+        
+        <!-- Work approved? Yes to Merge into main -->
+        <FlowchartFlow Id="flow_8" From="decision_1" To="process_7" Label="Yes"/>
+        
+        <!-- Work approved? No to Redo the work with feedback -->
+        <FlowchartFlow Id="flow_9" From="decision_1" To="process_8" Label="No"/>
+        
+        <!-- Merge into main to End -->
+        <FlowchartFlow Id="flow_10" From="process_7" To="end_1"/>
+        
+        <!-- Redo the work with feedback back to Pull request is made (loop) -->
+        <FlowchartFlow Id="flow_11" From="process_8" To="process_5"/>
+      </Connectors>
+    </FlowchartDiagram>
+  </Models>
+</Project>

@@ -51,3 +51,7 @@ You should see the _Chirp!_ public page here.
 "Torkil á Torkilsheyggi <toat@itu.dk>" <br>
 
 "Sune hesselberg <shes@itu.dk>" 
+
+
+## Known Issues:
+- GitHub Actions currently fails when running multiple test suites concurrently. Tests pass when run individually locally.
